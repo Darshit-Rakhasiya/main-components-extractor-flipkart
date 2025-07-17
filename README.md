@@ -50,15 +50,6 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-> `requirements.txt` should include:
->
-> ```
-> fastapi
-> uvicorn
-> curl_cffi
-> jmespath
-> ```
-
 ---
 
 ## 🧪 API Usage
