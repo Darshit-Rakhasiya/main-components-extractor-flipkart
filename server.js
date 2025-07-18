@@ -1,21 +1,32 @@
+require('dotenv').config();
+const express = require('express');
 const { spawn } = require('child_process');
 const axios = require('axios');
-const app = require('./app');
+const connectDB = require('./config/db');
+const userAuthRoutes = require('./routes/userAuthRoutes');
+const adminAuthRoutes = require('./routes/adminAuthRoutes');
 
-const PORT = 3000;
-const FASTAPI_URL = 'http://127.0.0.1:8000';
+const app = express();
+app.use(express.json());
+app.use('/user/', userAuthRoutes);
+app.use('/admin/', adminAuthRoutes);
+
+const PORT = process.env.PORT || 3000;
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
 
 async function checkFastApiServer() {
     try {
         await axios.get(FASTAPI_URL);
         console.log('FastAPI server is already running.');
     } catch (err) {
-        console.log('FastAPI server not running. Starting it now...');
+        console.log('FastAPI not running. Starting it...');
         spawn('python', ['main.py'], { stdio: 'inherit' });
     }
 }
 
 (async () => {
+    await connectDB();
+
     await checkFastApiServer();
 
     setTimeout(() => {

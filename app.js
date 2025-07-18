@@ -1,8 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const FASTAPI_URL = 'http://127.0.0.1:8000';
 
 app.use(express.json());
 
@@ -14,7 +14,7 @@ app.post('/scrape-flipkart-pdp', async (req, res) => {
     }
 
     try {
-        const response = await axios.post(`${FASTAPI_URL}/get-product-info/`, req.body);
+        const response = await axios.post(`${process.env.FASTAPI_URL}/get-product-info/`, req.body);
         res.json(response.data);
     } catch (error) {
         console.error('Error contacting FastAPI:', error.message);

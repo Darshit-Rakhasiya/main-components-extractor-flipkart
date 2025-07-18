@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const Admin = require('../models/Admin');
 
-exports.registerUser = async (req, res) => {
+exports.registerAdmin = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
@@ -9,20 +9,20 @@ exports.registerUser = async (req, res) => {
     }
 
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
+        const existingAdmin = await Admin.findOne({ email });
+        if (existingAdmin) {
             return res.status(409).json({ success: false, message: 'Email already registered' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new User({ name, email, password: hashedPassword });
-        await user.save();
+        const admin = new Admin({ name, email, password: hashedPassword });
+        await admin.save();
 
         res.status(201).json({
             success: true,
-            message: 'User registered successfully',
-            user: { name: user.name, email: user.email }
+            message: 'Admin registered successfully',
+            admin: { name: admin.name, email: admin.email }
         });
     } catch (err) {
         console.error(err);
@@ -30,7 +30,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-exports.loginUser = async (req, res) => {
+exports.loginAdmin = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -38,9 +38,9 @@ exports.loginUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({ success: false, message: 'Admin not found' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -51,7 +51,7 @@ exports.loginUser = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Login successful',
-            user: { name: user.name, email: user.email }
+            admin: { name: admin.name, email: admin.email }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error' });

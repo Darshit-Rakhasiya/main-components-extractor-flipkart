@@ -2,9 +2,10 @@
   "name": "main-components-extractor-flipkart",
   "version": "1.0.0",
   "description": "This project implements a FastAPI-based service to fetch product information from Flipkart product pages. It validates API keys, tracks usage, extracts product data from Flipkart's `__INITIAL_STATE__` JavaScript variable, and logs requests and responses to MongoDB.",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "સર્વર_ચાલુ_કરો": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,8 @@
     "express": "^5.1.0",
     "http": "^0.0.1-security",
     "mongoose": "^8.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
