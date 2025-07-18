@@ -8,3 +8,10 @@ HEADERS = {
         "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     )
 }
+
+from pymongo import MongoClient
+
+CONN = MongoClient('mongodb://localhost:27017/')
+DB = CONN.flipkart_api
+KEY_COLLECTION = DB.key_table
+LOG_COLLECTION = DB.logs_table

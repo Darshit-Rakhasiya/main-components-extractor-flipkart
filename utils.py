@@ -1,10 +1,9 @@
-from collections import defaultdict
-
-attempts = defaultdict(int)
+from config import KEY_COLLECTION, LOG_COLLECTION, HEIGHT_WIDTH, QUALITY
+from urllib.parse import urlparse, parse_qs
+import jmespath
 
 def is_valid_flipkart_url(url):
     try:
-        from urllib.parse import urlparse, parse_qs
         parsed = urlparse(url)
         if "flipkart.com" not in parsed.netloc:
             return False
@@ -14,14 +13,13 @@ def is_valid_flipkart_url(url):
         return False
 
 def build_breadcrumbs(data):
-    import jmespath
+
     breadcrumbs = jmespath.search(
         "pageDataV4.productPageMetadata.breadcrumbs[*].title", data
     )
-    return {f"l{i+1}": title for i, title in enumerate(breadcrumbs)} if breadcrumbs else "No breadcrumbs found"
+    return {f"l{i+1}": title for i, title in enumerate(breadcrumbs)} if breadcrumbs else {}
 
 def build_image_url(raw_url):
-    from config import HEIGHT_WIDTH, QUALITY 
     if not raw_url:
         return "No image available"
     return (
@@ -30,9 +28,33 @@ def build_image_url(raw_url):
                 .replace("{@quality}", QUALITY)
     )
 
-def validate_api(api):
-    print(api)
-    return api == "123"
+def validate_api(api_key):
 
-def get_try(api_key):
-    return attempts[api_key]
+    document = KEY_COLLECTION.find_one({"key": api_key})
+
+    if not document:
+        return False, "Invalid API key"
+
+    if not document.get("status", False):
+        return False, "API key is inactive"
+
+    usage = document.get("usage", 0)
+    limit = document.get("limit", 0)
+
+    if usage >= limit:
+        return False, "API usage limit exceeded"
+
+    KEY_COLLECTION.update_one({"key": api_key}, {"$inc": {"usage": 1}})
+    return True, "API key validated"
+
+def logger(ip, params, request_time, status_code, key, response):
+    data = {
+        "ip":ip,
+        "params":params,
+        "request_time":request_time,
+        "status_code":status_code,
+        "key":key,
+        "response":response
+    }
+    
+    LOG_COLLECTION.insert_one(data)
