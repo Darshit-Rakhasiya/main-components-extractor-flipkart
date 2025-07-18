@@ -1,4 +1,4 @@
-from config import KEY_COLLECTION, LOG_COLLECTION, HEIGHT_WIDTH, QUALITY
+from pdp_extractor.config import KEY_COLLECTION, LOG_COLLECTION, HEIGHT_WIDTH, QUALITY
 from urllib.parse import urlparse, parse_qs
 import jmespath
 

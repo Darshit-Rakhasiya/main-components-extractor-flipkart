@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from utils import is_valid_flipkart_url, validate_api, logger
-from extractor import get_initial_state, extract_product_info
+from pdp_extractor.utils import is_valid_flipkart_url, validate_api, logger
+from pdp_extractor.extractor import get_initial_state, extract_product_info
 from datetime import datetime
 from json import loads
 from time import time

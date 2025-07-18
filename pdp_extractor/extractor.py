@@ -2,8 +2,8 @@ import re
 import json
 from curl_cffi import requests
 import jmespath
-from config import HEADERS, DEFAULT_TEXT
-from utils import build_breadcrumbs, build_image_url
+from pdp_extractor.config import HEADERS, DEFAULT_TEXT
+from pdp_extractor.utils import build_breadcrumbs, build_image_url
 
 def get_initial_state(url):
     try:
