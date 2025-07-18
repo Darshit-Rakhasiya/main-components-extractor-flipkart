@@ -1,0 +1,26 @@
+{
+  "name": "main-components-extractor-flipkart",
+  "version": "1.0.0",
+  "description": "This project implements a FastAPI-based service to fetch product information from Flipkart product pages. It validates API keys, tracks usage, extracts product data from Flipkart's `__INITIAL_STATE__` JavaScript variable, and logs requests and responses to MongoDB.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Darshit-Rakhasiya/main-components-extractor-flipkart.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Darshit-Rakhasiya/main-components-extractor-flipkart/issues"
+  },
+  "homepage": "https://github.com/Darshit-Rakhasiya/main-components-extractor-flipkart#readme",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "child_process": "^1.0.2",
+    "express": "^5.1.0",
+    "http": "^0.0.1-security"
+  }
+}

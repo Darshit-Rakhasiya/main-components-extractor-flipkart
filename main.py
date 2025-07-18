@@ -34,6 +34,10 @@ def main(user_input: str, api_key: str):
         "message": "Product info fetched successfully.",
         "data": product
     }
+    
+@app.get("/")
+async def running_server(request: Request):
+    return {"Your_ip": request.client.host}
 
 @app.post("/get-product-info/")
 async def get_product_info(request: Request, url_request: URLRequest):
