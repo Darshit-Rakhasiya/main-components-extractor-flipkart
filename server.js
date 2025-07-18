@@ -4,12 +4,14 @@ const { spawn } = require('child_process');
 const axios = require('axios');
 const connectDB = require('./config/db');
 const userAuthRoutes = require('./routes/userAuthRoutes');
+const keyAuthRoutes = require('./routes/keyAuthRoutes')
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 
 const app = express();
 app.use(express.json());
 app.use('/user/', userAuthRoutes);
 app.use('/admin/', adminAuthRoutes);
+app.use('/key/', keyAuthRoutes)
 
 const PORT = process.env.PORT || 3000;
 const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
