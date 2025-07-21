@@ -1,8 +1,11 @@
 const Log = require('../models/Log');
+const devLog = require("../models/DevLog")
 
 exports.getAllLogs = async (req, res) => {
     try {
         const logs = await Log.find();
+
+        await devLog.create({message: `All logs retrieved`})
 
         res.status(200).json({
             success: true,
@@ -34,6 +37,8 @@ exports.insertLog = async (req, res) => {
         });
 
         const savedLog = await newLog.save();
+
+        await devLog.create({message: `New Log inserted - name:${ip} & API:${key}`})
 
         res.status(201).json({
             success: true,

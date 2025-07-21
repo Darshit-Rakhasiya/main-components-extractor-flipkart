@@ -1,4 +1,5 @@
 const Key = require('../models/Key');
+const devLog = require("../models/DevLog")
 
 exports.registerKey = async (req, res) => {
     const { name, key, usage, limit, status } = req.body;
@@ -16,6 +17,8 @@ exports.registerKey = async (req, res) => {
 
         const newKey = new Key({ name, key, usage, limit, status });
         await newKey.save();
+
+        await devLog.create({message: `New API key registered - name:${name} & API:${key}`})
 
         res.status(201).json({
             success: true,
@@ -72,6 +75,8 @@ exports.updateKey = async (req, res) => {
 
         await keyToUpdate.save();
 
+        await devLog.create({message: `API key Updated - name:${keyToUpdate.name} & API:${keyToUpdate.key}`})
+
         res.status(200).json({
             success: true,
             message: 'Key updated successfully',
@@ -104,6 +109,8 @@ exports.deleteKey = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Key not found' });
         }
 
+        await devLog.create({message: `API key Deleted - name:${deletedKey.name} & API:${deletedKey.key}`})
+
         res.status(200).json({
             success: true,
             message: 'Key deleted successfully',
@@ -118,6 +125,8 @@ exports.deleteKey = async (req, res) => {
 exports.getAllKeys = async (req, res) => {
     try {
         const keys = await Key.find();
+
+        await devLog.create({message: `All API key retrieved`})
 
         res.status(200).json({
             success: true,
@@ -135,6 +144,8 @@ exports.findKey = async (req, res) => {
         const { key } = req.body;
 
         const foundKey = await Key.findOne({ key });
+
+        await devLog.create({message: `API key found - name:${foundKey.name} & API:${foundKey.key}`})
 
         if (foundKey) {
             res.status(200).json({

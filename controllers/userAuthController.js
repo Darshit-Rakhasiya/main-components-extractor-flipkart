@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const devLog = require("../models/DevLog")
 
 exports.registerUser = async (req, res) => {
     const { name, email, password, updateAcess = false } = req.body;
@@ -18,6 +19,8 @@ exports.registerUser = async (req, res) => {
 
         const user = new User({ name, email, password: hashedPassword, updateAcess });
         await user.save();
+
+        await devLog.create({message: `New user registered - name:${name} & email:${email}`})
 
         res.status(201).json({
             success: true,
@@ -49,6 +52,8 @@ exports.loginUser = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
+        await devLog.create({message: `User Login - name:${user.name} & email:${email}`})
+
         res.status(200).json({
             success: true,
             message: 'Login successful',
@@ -62,6 +67,8 @@ exports.loginUser = async (req, res) => {
 exports.getAllUser = async (req, res) => {
     try {
         const users = await User.find();
+
+        await devLog.create({message: `All user retrieved`})
 
         res.status(200).json({
             success: true,
@@ -88,6 +95,8 @@ exports.deleteUser = async (req, res) => {
         }
 
         await User.deleteOne({ email });
+
+        await devLog.create({message: `User deleted - name:${user.name} & email:${user.email}`})
 
         res.status(200).json({
             success: true,
@@ -136,6 +145,8 @@ exports.updateUser = async (req, res) => {
         }
 
         await userToUpdate.save();
+
+        await devLog.create({message: `User updated - name:${userToUpdate.name} & email:${userToUpdate.email}`})
 
         res.status(200).json({
             success: true,

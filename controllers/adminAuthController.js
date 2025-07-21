@@ -20,7 +20,7 @@ exports.registerAdmin = async (req, res) => {
         const admin = new Admin({ name, email, password: hashedPassword });
         await admin.save();
 
-        await devLog.create({message: `Admin Registered - ${name}`})
+        await devLog.create({message: `Admin Registered - name:${name} & email:${email}`})
 
         res.status(201).json({
             success: true,
@@ -51,7 +51,7 @@ exports.loginAdmin = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
-        await devLog.create({message: `Admin Login - ${admin.name}`})
+        await devLog.create({message: `Admin Login - name:${admin.name} & email:${email}`})
 
         res.status(200).json({
             success: true,
@@ -96,7 +96,7 @@ exports.deleteAdmin = async (req, res) => {
 
         await Admin.deleteOne({ email });
 
-        await devLog.create({message: `Admin Deleted - ${admin.name}`})
+        await devLog.create({message: `Admin Deleted - name:${admin.name} & email:${email}`})
 
         res.status(200).json({
             success: true,
@@ -143,7 +143,7 @@ exports.updateAdmin = async (req, res) => {
 
         await adminToUpdate.save();
 
-        await devLog.create({message: `Admin Updated - ${adminToUpdate.name}`})
+        await devLog.create({message: `Admin Updated - name:${adminToUpdate.name} & email:${adminToUpdate.email}`})
 
         res.status(200).json({
             success: true,
