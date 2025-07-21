@@ -58,3 +58,18 @@ exports.loginAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+exports.getAllAdmin = async (req, res) => {
+    try {
+        const admins = await Admin.find();
+
+        res.status(200).json({
+            success: true,
+            count: admins.length,
+            admins
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
