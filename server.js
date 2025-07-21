@@ -8,6 +8,7 @@ const keyAuthRoutes = require('./routes/keyAuthRoutes')
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const logAuthRoutes = require('./routes/logAuthRoutes')
 const devLogAuthRoutes = require('./routes/devLogAuthRoutes')
+const superAdminAuthRoutes = require('./routes/superAdminAuthRoutes')
 const app = require('./app');
 
 app.use('/user/', userAuthRoutes);
@@ -15,8 +16,9 @@ app.use('/admin/', adminAuthRoutes);
 app.use('/key/', keyAuthRoutes)
 app.use('/logs/', logAuthRoutes)
 app.use('/devlogs/', devLogAuthRoutes)
+app.use('/super/', superAdminAuthRoutes)
 
-const {PORT, FASTAPI_URL} = process.env;
+const { PORT, FASTAPI_URL } = process.env;
 
 async function checkFastApiServer() {
     try {

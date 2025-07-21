@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
-const devLog = require("../models/DevLog")
+const devLog = require("../models/DevLog");
+const User = require('../models/User');
+const SuperAdmin = require('../models/SuperAdmin');
 
 exports.registerAdmin = async (req, res) => {
     const { name, email, password } = req.body;
@@ -10,8 +12,11 @@ exports.registerAdmin = async (req, res) => {
     }
 
     try {
-        const existingAdmin = await Admin.findOne({ email });
-        if (existingAdmin) {
+        const existingUser = await User.findOne({ email });
+        const existingAdmin = await Admin.findOne({ email })
+        const existingSuperAdmin = await SuperAdmin.findOne({ email })
+
+        if (existingUser || existingAdmin || existingSuperAdmin) {
             return res.status(409).json({ success: false, message: 'Email already registered' });
         }
 
@@ -20,7 +25,7 @@ exports.registerAdmin = async (req, res) => {
         const admin = new Admin({ name, email, password: hashedPassword });
         await admin.save();
 
-        await devLog.create({message: `Admin Registered - name:${name} & email:${email}`})
+        await devLog.create({ message: `Admin Registered - name:${name} & email:${email}` })
 
         res.status(201).json({
             success: true,
@@ -51,7 +56,7 @@ exports.loginAdmin = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
-        await devLog.create({message: `Admin Login - name:${admin.name} & email:${email}`})
+        await devLog.create({ message: `Admin Login - name:${admin.name} & email:${email}` })
 
         res.status(200).json({
             success: true,
@@ -68,7 +73,7 @@ exports.getAllAdmin = async (req, res) => {
     try {
         const admins = await Admin.find();
 
-        await devLog.create({message: `All admin retrieved`})
+        await devLog.create({ message: `All admin retrieved` })
 
         res.status(200).json({
             success: true,
@@ -96,7 +101,7 @@ exports.deleteAdmin = async (req, res) => {
 
         await Admin.deleteOne({ email });
 
-        await devLog.create({message: `Admin Deleted - name:${admin.name} & email:${email}`})
+        await devLog.create({ message: `Admin Deleted - name:${admin.name} & email:${email}` })
 
         res.status(200).json({
             success: true,
@@ -110,7 +115,7 @@ exports.deleteAdmin = async (req, res) => {
 };
 
 exports.updateAdmin = async (req, res) => {
-    const { originalEmail, name, email, password } = req.body;
+    const { originalEmail, name, email, password, access } = req.body;
 
     if (!originalEmail) {
         return res.status(400).json({ success: false, message: 'originalEmail is required to identify the admin to update' });
@@ -140,10 +145,13 @@ exports.updateAdmin = async (req, res) => {
             const hashedPassword = await bcrypt.hash(password, salt);
             adminToUpdate.password = hashedPassword;
         }
+        if (access !== undefined) {
+            adminToUpdate.access = access
+        }
 
         await adminToUpdate.save();
 
-        await devLog.create({message: `Admin Updated - name:${adminToUpdate.name} & email:${adminToUpdate.email}`})
+        await devLog.create({ message: `Admin Updated - name:${adminToUpdate.name} & email:${adminToUpdate.email}` })
 
         res.status(200).json({
             success: true,
