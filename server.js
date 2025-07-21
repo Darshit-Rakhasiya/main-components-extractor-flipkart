@@ -7,12 +7,14 @@ const userAuthRoutes = require('./routes/userAuthRoutes');
 const keyAuthRoutes = require('./routes/keyAuthRoutes')
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const logAuthRoutes = require('./routes/logAuthRoutes')
+const devLogAuthRoutes = require('./routes/devLogAuthRoutes')
 const app = require('./app');
 
 app.use('/user/', userAuthRoutes);
 app.use('/admin/', adminAuthRoutes);
 app.use('/key/', keyAuthRoutes)
 app.use('/logs/', logAuthRoutes)
+app.use('/devlogs/', devLogAuthRoutes)
 
 const {PORT, FASTAPI_URL} = process.env;
 

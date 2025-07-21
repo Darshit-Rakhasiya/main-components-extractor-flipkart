@@ -38,7 +38,7 @@ exports.insertLog = async (req, res) => {
 
         const savedLog = await newLog.save();
 
-        await devLog.create({message: `New Log inserted - name:${ip} & API:${key}`})
+        await devLog.create({message: `New Log inserted - IP:${ip} & API:${key}`})
 
         res.status(201).json({
             success: true,
