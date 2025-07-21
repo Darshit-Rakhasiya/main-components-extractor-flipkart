@@ -1,6 +1,7 @@
-from pdp_extractor.config import KEY_COLLECTION, LOG_COLLECTION, HEIGHT_WIDTH, QUALITY
+from pdp_extractor.config import HEIGHT_WIDTH, QUALITY, DB_API
 from urllib.parse import urlparse, parse_qs
 import jmespath
+from curl_cffi import requests
 
 def is_valid_flipkart_url(url):
     try:
@@ -28,12 +29,15 @@ def build_image_url(raw_url):
                 .replace("{@quality}", QUALITY)
     )
 
+import requests
+
 def validate_api(api_key):
+    response = requests.post(f"{DB_API}key/findKey", json={"key": api_key})
 
-    document = KEY_COLLECTION.find_one({"key": api_key})
-
-    if not document:
+    if response.status_code != 200:
         return False, "Invalid API key"
+
+    document = response.json()
 
     if not document.get("status", False):
         return False, "API key is inactive"
@@ -44,17 +48,16 @@ def validate_api(api_key):
     if usage >= limit:
         return False, "API usage limit exceeded"
 
-    KEY_COLLECTION.update_one({"key": api_key}, {"$inc": {"usage": 1}})
+    requests.post(f"{DB_API}key/update", json={"originalKey": api_key, "incrementUsage": True})
     return True, "API key validated"
 
-def logger(ip, params, request_time, status_code, key, response):
+
+def logger(ip, params, status_code, key, response):
     data = {
         "ip":ip,
         "params":params,
-        "request_time":request_time,
         "status_code":status_code,
         "key":key,
         "response":response
     }
-    
-    LOG_COLLECTION.insert_one(data)
+    requests.post(f"{DB_API}logs/insert", json=data)

@@ -9,9 +9,4 @@ HEADERS = {
     )
 }
 
-from pymongo import MongoClient
-
-CONN = MongoClient('mongodb://localhost:27017/')
-DB = CONN.flipkart_api
-KEY_COLLECTION = DB.key_table
-LOG_COLLECTION = DB.logs_table
+DB_API = 'http://localhost:3000/'

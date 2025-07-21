@@ -6,15 +6,16 @@ const connectDB = require('./config/db');
 const userAuthRoutes = require('./routes/userAuthRoutes');
 const keyAuthRoutes = require('./routes/keyAuthRoutes')
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
-
-const app = express();
-app.use(express.json());
+const logAuthRoutes = require('./routes/logAuthRoutes')
+const app = require('./app');
+// const app = express();
+// app.use(express.json());
 app.use('/user/', userAuthRoutes);
 app.use('/admin/', adminAuthRoutes);
 app.use('/key/', keyAuthRoutes)
+app.use('/logs/', logAuthRoutes)
 
-const PORT = process.env.PORT || 3000;
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
+const {PORT, FASTAPI_URL} = process.env;
 
 async function checkFastApiServer() {
     try {

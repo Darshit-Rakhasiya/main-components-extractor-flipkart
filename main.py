@@ -42,11 +42,9 @@ async def running_server(request: Request):
 @app.post("/get-product-info/")
 async def get_product_info(request: Request, url_request: URLRequest):
     client_ip = request.client.host
-    req_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     body = await request.body()
     print(f"Client IP: {client_ip}")
-    print(f"Request Time: {req_time}")
     print(f"Request Body: {body.decode('utf-8')}")
 
     s_time = time()
@@ -60,7 +58,7 @@ async def get_product_info(request: Request, url_request: URLRequest):
     print(f"Status Code: {status_code}")
 
     resp = {"query_params": loads(body),
-            "excution_time":execution_time,
+            "execution_time":execution_time,
             "success": True,
             "message": result["message"],
             "data": result.get("data")}
@@ -72,7 +70,7 @@ async def get_product_info(request: Request, url_request: URLRequest):
     print(url_request.api)
     print(type(body))
     
-    logger(client_ip, loads(body), req_time, status_code, api_key, resp)
+    logger(client_ip, loads(body), status_code, api_key, resp)
     
     return resp
 
