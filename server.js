@@ -8,8 +8,7 @@ const keyAuthRoutes = require('./routes/keyAuthRoutes')
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const logAuthRoutes = require('./routes/logAuthRoutes')
 const app = require('./app');
-// const app = express();
-// app.use(express.json());
+
 app.use('/user/', userAuthRoutes);
 app.use('/admin/', adminAuthRoutes);
 app.use('/key/', keyAuthRoutes)
