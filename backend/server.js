@@ -9,6 +9,7 @@ const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const logAuthRoutes = require('./routes/logAuthRoutes')
 const devLogAuthRoutes = require('./routes/devLogAuthRoutes')
 const superAdminAuthRoutes = require('./routes/superAdminAuthRoutes')
+const schemaAuthRoutes = require('./routes/schemaAuthRoutes')
 const app = require('./app');
 
 app.use('/user/', userAuthRoutes);
@@ -17,6 +18,7 @@ app.use('/key/', keyAuthRoutes)
 app.use('/logs/', logAuthRoutes)
 app.use('/devlogs/', devLogAuthRoutes)
 app.use('/super/', superAdminAuthRoutes)
+app.use('/schema/', schemaAuthRoutes)
 
 const { PORT, FASTAPI_URL } = process.env;
 
