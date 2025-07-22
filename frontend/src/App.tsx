@@ -8,7 +8,6 @@ import UserHomePage from './components/Home/UserHomePage';
 // Auth Pages
 import SignInPage from './components/Auth/SignInPage';
 import SignUpPage from './components/Auth/SignUpPage';
-import AdminSignInPage from './components/Auth/AdminSignInPage';
 
 // User Components
 import UserDashboard from './components/User/UserDashboard';
@@ -35,10 +34,6 @@ const App: React.FC = () => {
         {/* Auth Routes */}
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminSignInPage />} />
-        <Route path="/admin/signin" element={<AdminSignInPage />} />
 
         {/* User Pages */}
         <Route path="/user/dashboard" element={<UserDashboard />} />
