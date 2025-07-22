@@ -67,7 +67,7 @@ exports.updateKey = async (req, res) => {
         if (status !== undefined) {
             keyToUpdate.status = status;
         }
-
+// ok
         if (incrementUsage) {
             keyToUpdate.usage = (keyToUpdate.usage || 0) + 1;
             User.updateOne({ email: userEmail },{ $inc: { apiCalls: 1 } })
