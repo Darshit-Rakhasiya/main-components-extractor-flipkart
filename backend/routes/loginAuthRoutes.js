@@ -5,3 +5,5 @@ const { loginUser } = require('../controllers/loginAuthController');
 router.post('/', loginUser)
 
 module.exports = router;
+
+// ok
