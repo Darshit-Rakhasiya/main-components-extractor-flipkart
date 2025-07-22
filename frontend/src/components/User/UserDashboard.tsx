@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Globe,
   Send,
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 interface ApiKeyData {
   id: string;
