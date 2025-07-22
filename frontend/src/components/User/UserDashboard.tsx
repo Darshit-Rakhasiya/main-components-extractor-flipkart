@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 interface ApiKeyData {
   id: string;
@@ -27,9 +27,18 @@ interface ApiKeyData {
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  const [currentStep, setCurrentStep] = useState(1);
+
+  useEffect(() => {
+    const step = searchParams.get('step');
+    if (step === '2') {
+      setCurrentStep(2);
+    }
+  }, [searchParams]);
 
   /* ---------- Step & form state ---------- */
-  const [currentStep, setCurrentStep] = useState(1);
   const [platform, setPlatform] = useState('');
   const [category, setCategory] = useState('');
   const [type, setType] = useState('PDP');
@@ -203,7 +212,7 @@ const UserDashboard: React.FC = () => {
 
   /* ---------- Navigation stubs ---------- */
   const handleLogout = () => navigate('/');
-  const handleViewLogs = (id: string) => navigate(`/user/logs/${id}`);
+  const handleViewLogs = (id: string) => navigate(`/user/dashboard/logs/${id}`);
 
   /* ---------- UI ---------- */
   return (
