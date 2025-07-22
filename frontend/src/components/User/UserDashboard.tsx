@@ -18,6 +18,8 @@ const UserDashboard: React.FC = () => {
   const [platform, setPlatform] = useState('');
   const [category, setCategory] = useState('');
   const [type, setType] = useState('PDP');
+  const [database, setDatabase] = useState('');
+  const [collection, setCollection] = useState('');
 
   /* ---------- API‑test state ---------- */
   const [url, setUrl] = useState('');
@@ -42,10 +44,12 @@ const UserDashboard: React.FC = () => {
   // Step navigation with URL update
   const goToStep2 = () => {
     setCurrentStep(2);
+    setError('');
     window.history.replaceState(null, '', '/user/dashboard?step=2');
   };
   const goToStep1 = () => {
     setCurrentStep(1);
+    setError('');
     window.history.replaceState(null, '', '/user/dashboard');
   };
 
@@ -183,7 +187,7 @@ const UserDashboard: React.FC = () => {
         {currentStep === 1 && (
           <div className="bg-white/80 backdrop-blur-md rounded-xl p-8 border mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">API Configuration</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Input label="Platform *" value={platform} onChange={setPlatform} placeholder="Enter platform name" />
               <Input label="Category *" value={category} onChange={setCategory} placeholder="Enter category" />
               <div>
@@ -205,6 +209,8 @@ const UserDashboard: React.FC = () => {
                   ))}
                 </select>
               </div>
+              <Input label="Database *" value={database} onChange={setDatabase} placeholder="Enter database name" />
+              <Input label="Collection *" value={collection} onChange={setCollection} placeholder="Enter collection name" />
             </div>
 
             {error && (
@@ -212,7 +218,7 @@ const UserDashboard: React.FC = () => {
             )}
 
             <div className="mt-8 flex justify-end">
-              <Button onClick={() => (!platform || !category ? setError('Please fill in all required fields') : goToStep2())}>
+              <Button onClick={() => (!platform || !category || !database || !collection ? setError('Please fill in all required fields') : goToStep2())}>
                 Next Step <ChevronDown className="w-4 h-4 -rotate-90" />
               </Button>
             </div>
