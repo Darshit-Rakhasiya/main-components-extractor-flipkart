@@ -1,5 +1,4 @@
 require('dotenv').config();
-const express = require('express');
 const { spawn } = require('child_process');
 const axios = require('axios');
 const connectDB = require('./config/db');
@@ -10,6 +9,8 @@ const logAuthRoutes = require('./routes/logAuthRoutes')
 const devLogAuthRoutes = require('./routes/devLogAuthRoutes')
 const superAdminAuthRoutes = require('./routes/superAdminAuthRoutes')
 const schemaAuthRoutes = require('./routes/schemaAuthRoutes')
+const metaDataAuthRoutes = require('./routes/metaDataAuthRoutes')
+const login = require('./controllers/loginAuthController');
 const app = require('./app');
 
 app.use('/user/', userAuthRoutes);
@@ -19,6 +20,8 @@ app.use('/logs/', logAuthRoutes)
 app.use('/devlogs/', devLogAuthRoutes)
 app.use('/super/', superAdminAuthRoutes)
 app.use('/schema/', schemaAuthRoutes)
+app.use('/meta/', metaDataAuthRoutes)
+app.use('/login/', login)
 
 const { PORT, FASTAPI_URL } = process.env;
 
