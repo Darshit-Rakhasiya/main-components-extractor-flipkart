@@ -249,12 +249,15 @@ const UserDashboard: React.FC = () => {
     );
   };
 
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => {
+    // Add your logout logic here (e.g., clear tokens, redirect, etc.)
+    navigate('/');
+  };
 
   // --- UI ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-      <Navbar isAuthenticated={false} onLogout={handleLogout} />
+      <Navbar isAuthenticated={true} onLogout={handleLogout} />
 
       {/* main container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -469,9 +472,6 @@ const UserDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Data table */}
-            {renderTable()}
-
             {/* Navigation buttons at bottom */}
             <div className="flex space-x-3 mt-8">
               <button
@@ -480,7 +480,11 @@ const UserDashboard: React.FC = () => {
               >
                 ← Back to Step 1
               </button>
-              <Button onClick={goToStep3} className="flex-1">
+              <Button
+                onClick={goToStep3}
+                className="flex-1"
+                disabled={!apiResponse?.success}
+              >
                 Next Step →
               </Button>
             </div>
