@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
         {/* User Pages */}
         <Route path="/user/dashboard" element={<UserDashboard />} />
-        <Route path="/user/logs/:keyId" element={<UserLogsPage />} />
+        <Route path="/user/dashboard/logs/:keyId" element={<UserLogsPage />} />
 
         {/* Admin Pages */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
