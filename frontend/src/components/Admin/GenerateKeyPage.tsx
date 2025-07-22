@@ -86,6 +86,7 @@ const GenerateKeyPage: React.FC = () => {
     }
 
     const selectedUser = users.find(u => u.name.toLowerCase() === formData.assignedTo.toLowerCase());
+   
     // if (!selectedUser) return;
 
     if (!formData.database || !formData.collection) {
