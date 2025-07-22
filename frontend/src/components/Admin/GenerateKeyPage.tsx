@@ -11,6 +11,8 @@ interface GeneratedKey {
   usage: number;
   status: 'Active' | 'Deactive';
   createdAt: string;
+  database: string;
+  collection: string;
 }
 
 const GenerateKeyPage: React.FC = () => {
@@ -20,6 +22,8 @@ const GenerateKeyPage: React.FC = () => {
   const [formData, setFormData] = useState({
     assignedTo: '',
     assignedType: 'User' as 'User' | 'Admin',
+    database: '',             
+    collection: '',
     customKey: '',
     limit: 1000,
     status: 'Active' as 'Active' | 'Deactive'
@@ -46,7 +50,9 @@ const GenerateKeyPage: React.FC = () => {
         limit: 1000,
         usage: 750,
         status: 'Active',
-        createdAt: '2024-03-15T10:30:00Z'
+        createdAt: '2024-03-15T10:30:00Z',
+        database:'database',
+        collection:'collection',
       },
       {
         id: '2',
@@ -56,7 +62,9 @@ const GenerateKeyPage: React.FC = () => {
         limit: 500,
         usage: 120,
         status: 'Active',
-        createdAt: '2024-03-10T14:20:00Z'
+        createdAt: '2024-03-10T14:20:00Z',
+        database:"database",
+        collection:'collection',
       }
     ];
     setGeneratedKeys(mockKeys);
@@ -77,9 +85,13 @@ const GenerateKeyPage: React.FC = () => {
       return;
     }
 
-    const selectedUser = users.find(u => u.id === formData.assignedTo);
+    const selectedUser = users.find(u => u.name.toLowerCase() === formData.assignedTo.toLowerCase());
     if (!selectedUser) return;
 
+    if (!formData.database || !formData.collection) {
+    alert("Please enter both database and collection names.");
+    return;
+  }
     const newKey: GeneratedKey = {
       id: Date.now().toString(),
       keyValue: generateApiKey(),
@@ -88,7 +100,9 @@ const GenerateKeyPage: React.FC = () => {
       limit: formData.limit,
       usage: 0,
       status: formData.status,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      database: formData.database,
+      collection: formData.collection
     };
 
     setGeneratedKeys([newKey, ...generatedKeys]);
@@ -96,6 +110,8 @@ const GenerateKeyPage: React.FC = () => {
       assignedTo: '',
       assignedType: 'User',
       customKey: '',
+      database:'',
+      collection:'',
       limit: 1000,
       status: 'Active'
     });
@@ -117,9 +133,9 @@ const GenerateKeyPage: React.FC = () => {
 
   const downloadKeysAsCSV = () => {
     const csvContent = [
-      'ID,Key Value,Assigned To,Type,Limit,Usage,Status,Created At',
+      'ID,Key Value,Assigned To,Type,Limit,Usage,Status,Created At,Database,Collection',
       ...generatedKeys.map(key =>
-        `${key.id},${key.keyValue},${key.assignedTo},${key.assignedType},${key.limit},${key.usage},${key.status},${key.createdAt}`
+        `${key.id},${key.keyValue},${key.assignedTo},${key.assignedType},${key.limit},${key.usage},${key.status},${key.createdAt},${key.database},${key.collection}`
       )
     ].join('\n');
 
@@ -170,7 +186,7 @@ const GenerateKeyPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Assign to User/Admin
                   </label>
-                  <select
+                  {/* <select
                     value={formData.assignedTo}
                     onChange={(e) => {
                       const selectedUser = users.find(u => u.id === e.target.value);
@@ -188,7 +204,22 @@ const GenerateKeyPage: React.FC = () => {
                         {user.name} ({user.type})
                       </option>
                     ))}
-                  </select>
+                  </select> */}
+                  <input
+                    type="text"
+                    value={formData.assignedTo}
+                    onChange={(e) => {
+                      const selectedUser = users.find(u => u.name.toLowerCase() === e.target.value.toLowerCase());
+                      setFormData({
+                        ...formData,
+                        assignedTo: e.target.value,
+                        assignedType: selectedUser?.type || 'User'
+                      });
+                    }}
+                    placeholder="Enter User/Admin"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  
                 </div>
 
                 <div>
@@ -203,6 +234,33 @@ const GenerateKeyPage: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Enter Database
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.database}
+                    onChange={(e) => setFormData({ ...formData, database: e.target.value })}
+                    placeholder="Enter Database"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Enter Collection
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.collection}
+                    onChange={(e) => setFormData({ ...formData, collection: e.target.value })}
+                    placeholder="Enter Collection"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
