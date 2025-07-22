@@ -3,29 +3,58 @@ import { UserPlus, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const SignUpPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [signInData, setSignInData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  })
   const navigate = useNavigate();
+
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    const { name, value } = e.target;
+
+    setSignInData({
+      ...signInData,
+      [name]: value
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (password !== confirmPassword) {
+    if (signInData.password !== signInData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    console.log(name, email, password, confirmPassword);
-    
+    console.log(signInData);
+
+    axios.post("http://localhost:3000/user/register", signInData)
+      .then((res) => {
+        console.log(res.data);
+        toast.success("User Registered", {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true, 
+          pauseOnHover: true, 
+          draggable: true,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      })
 
     // setIsLoading(true);
 
@@ -64,9 +93,10 @@ const SignUpPage: React.FC = () => {
                   <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
+                    name="name"
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={signInData.name}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
                   />
@@ -80,8 +110,9 @@ const SignUpPage: React.FC = () => {
                   <input
                     type="email"
                     required
-                    value={email.toLowerCase()}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name='email'
+                    value={signInData.email.toLowerCase()}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
                   />
@@ -95,8 +126,9 @@ const SignUpPage: React.FC = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name='password'
+                    value={signInData.password}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your password"
                   />
@@ -117,8 +149,9 @@ const SignUpPage: React.FC = () => {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    name='confirmPassword'
+                    value={signInData.confirmPassword}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Confirm your password"
                   />
@@ -130,7 +163,7 @@ const SignUpPage: React.FC = () => {
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                {password && confirmPassword && password !== confirmPassword && (
+                {signInData.password && signInData.confirmPassword && signInData.password !== signInData.confirmPassword && (
                   <p className="text-red-600 text-sm mt-1">Passwords do not match</p>
                 )}
               </div>
