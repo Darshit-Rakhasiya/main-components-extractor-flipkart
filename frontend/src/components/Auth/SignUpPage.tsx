@@ -1,38 +1,40 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { UserPlus, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
+import toast from 'react-hot-toast';
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
-  const { signup, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    try {
-      const success = await signup(email, password, name, 'user');
-      if (success) {
-        navigate('/user/dashboard');
-      } else {
+    // Simulate backend delay
+    setTimeout(() => {
+      // Dummy existing user check
+      if (email === 'test@example.com') {
         setError('User already exists');
+      } else {
+        toast.success('Account created successfully!');
+        navigate('/user/dashboard');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    }
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       <Navbar />
-      
+
       <div className="flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-8">
@@ -46,9 +48,7 @@ const SignUpPage: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
@@ -63,9 +63,7 @@ const SignUpPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
@@ -80,9 +78,7 @@ const SignUpPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
@@ -118,7 +114,7 @@ const SignUpPage: React.FC = () => {
               >
                 Already have an account? Sign in
               </Link>
-              {/* Add link for admins */}
+
               <div className="flex items-center justify-center space-x-2">
                 <ArrowLeft className="w-4 h-4 text-gray-400" />
                 <Link
@@ -132,7 +128,7 @@ const SignUpPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

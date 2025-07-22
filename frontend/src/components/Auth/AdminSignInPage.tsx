@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { Shield, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
@@ -10,30 +9,30 @@ const AdminSignInPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    try {
-      const success = await login(email, password, 'admin');
-      if (success) {
+    // 👉 Replace this mock logic with your real API call
+    setTimeout(() => {
+      if (email === 'admin@example.com' && password === 'admin123') {
         toast.success('Successfully signed in as admin!');
         navigate('/admin/dashboard');
       } else {
         setError('Invalid admin credentials');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    }
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       <Navbar />
-      
+
       <div className="flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-8">
@@ -96,7 +95,6 @@ const AdminSignInPage: React.FC = () => {
             </form>
 
             <div className="mt-6 text-center space-y-4">
-              {/* Temporary testing link */}
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-sm text-yellow-800 mb-2">For Testing Only:</p>
                 <Link
@@ -106,7 +104,7 @@ const AdminSignInPage: React.FC = () => {
                   Go to Admin Dashboard
                 </Link>
               </div>
-              
+
               <div className="flex items-center justify-center space-x-2">
                 <ArrowLeft className="w-4 h-4 text-gray-400" />
                 <Link
@@ -120,7 +118,7 @@ const AdminSignInPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

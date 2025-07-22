@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Download, Key, Calendar, User, Settings } from 'lucide-react';
+import { Plus, Download, Key } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 
 interface GeneratedKey {

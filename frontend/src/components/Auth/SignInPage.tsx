@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { User, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
@@ -10,30 +9,30 @@ const SignInPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    try {
-      const success = await login(email, password, 'user');
-      if (success) {
-        toast.success('Successfully signed in!'); // Add success notification
+    // Dummy sign-in logic
+    setTimeout(() => {
+      if (email === 'test@example.com' && password === 'password') {
+        toast.success('Successfully signed in!');
         navigate('/user/dashboard');
       } else {
         setError('Invalid credentials');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    }
+      setIsLoading(false);
+    }, 1000); // Simulate async
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       <Navbar />
-      
+
       <div className="flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-8">
@@ -102,7 +101,7 @@ const SignInPage: React.FC = () => {
               >
                 Don't have an account? Sign up
               </Link>
-              
+
               <div className="flex items-center justify-center space-x-2">
                 <ArrowLeft className="w-4 h-4 text-gray-400" />
                 <Link
@@ -116,7 +115,7 @@ const SignInPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

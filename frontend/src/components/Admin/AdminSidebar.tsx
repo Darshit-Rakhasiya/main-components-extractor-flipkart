@@ -1,22 +1,20 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { 
-  BarChart3, 
-  FileText, 
-  Shield, 
-  Users, 
-  Key, 
-  Database, 
+import {
+  BarChart3,
+  FileText,
+  Shield,
+  Users,
+  Key,
+  Database,
   Settings,
   Plus
 } from 'lucide-react';
 
 const AdminSidebar: React.FC = () => {
   const location = useLocation();
-  const { user } = useAuth();
 
-  const allMenuItems = [
+  const menuItems = [
     { path: '/admin/dashboard', icon: BarChart3, label: 'Dashboard' },
     { path: '/admin/request-log', icon: FileText, label: 'Request Log' },
     { path: '/admin/admin-details', icon: Shield, label: 'Admin Details' },
@@ -26,32 +24,6 @@ const AdminSidebar: React.FC = () => {
     { path: '/admin/update-key-table', icon: Database, label: 'Update Key Table' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
-
-  // Filter menu items based on user role
-  const getMenuItems = () => {
-    if (user?.role === 'Super Admin') {
-      return allMenuItems.filter(item => 
-        item.label === 'Dashboard' ||
-        item.label === 'Admin Details' || 
-        item.label === 'User Details' || 
-        item.label === 'Request Log' || // Developer Logs
-        item.label === 'Settings'
-      );
-    } else if (user?.role === 'admin') {
-      return allMenuItems.filter(item => 
-        item.label === 'Dashboard' ||
-        item.label === 'User Details' || 
-        item.label === 'Request Log' || // Developer Logs
-        item.label === 'Usage Key Details' || // Total API Keys
-        item.label === 'Generate Key Table' || 
-        item.label === 'Update Key Table' ||
-        item.label === 'Settings'
-      );
-    }
-    return allMenuItems;
-  };
-
-  const menuItems = getMenuItems();
 
   return (
     <div className="w-64 bg-white/80 backdrop-blur-md border-r border-gray-200 h-screen sticky top-0">
@@ -64,12 +36,12 @@ const AdminSidebar: React.FC = () => {
             Admin Panel
           </h2>
         </div>
-        
+
         <nav className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <Link
                 key={item.path}

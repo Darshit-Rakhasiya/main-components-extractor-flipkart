@@ -169,7 +169,7 @@ const AdminDashboard: React.FC = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                 outerRadius={80}
                 fill="#8884d8"
               >
@@ -209,11 +209,10 @@ const AdminDashboard: React.FC = () => {
               return (
                 <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      request.statusCode >= 200 && request.statusCode < 300 
-                        ? 'bg-emerald-500' 
+                    <div className={`w-3 h-3 rounded-full ${request.statusCode >= 200 && request.statusCode < 300
+                        ? 'bg-emerald-500'
                         : 'bg-red-500'
-                    }`}></div>
+                      }`}></div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
                         {user?.name || 'Unknown User'}

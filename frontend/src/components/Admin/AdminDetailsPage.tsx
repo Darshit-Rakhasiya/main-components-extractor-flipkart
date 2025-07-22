@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Edit, Trash2, Shield, UserCheck, UserX } from 'lucide-react';
+import { Search, Plus, Shield } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface Admin {
   id: string;
@@ -13,12 +12,10 @@ interface Admin {
 }
 
 const AdminDetailsPage: React.FC = () => {
-  const { user } = useAuth();
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [filteredAdmins, setFilteredAdmins] = useState<Admin[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
   const [newAdmin, setNewAdmin] = useState({
     name: '',
     email: '',
@@ -27,7 +24,6 @@ const AdminDetailsPage: React.FC = () => {
   });
 
   useEffect(() => {
-    // Mock data - in real app, fetch from API
     const mockAdmins: Admin[] = [
       {
         id: '1',
@@ -80,30 +76,10 @@ const AdminDetailsPage: React.FC = () => {
     setShowAddModal(false);
   };
 
-  const handleUpdateRole = (adminId: string, newRole: 'Super Admin' | 'Admin') => {
-    setAdmins(admins.map(admin =>
-      admin.id === adminId ? { ...admin, role: newRole } : admin
-    ));
-  };
-
-  const handleToggleStatus = (adminId: string) => {
-    setAdmins(admins.map(admin =>
-      admin.id === adminId 
-        ? { ...admin, status: admin.status === 'Active' ? 'Blocked' : 'Active' }
-        : admin
-    ));
-  };
-
-  const handleDeleteAdmin = (adminId: string) => {
-    if (window.confirm('Are you sure you want to delete this admin?')) {
-      setAdmins(admins.filter(admin => admin.id !== adminId));
-    }
-  };
-
   return (
     <AdminLayout pageTitle="Admin Details">
       <div className="space-y-6">
-        {/* Header with Search and Add Button */}
+        {/* Search & Add */}
         <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="relative flex-1 max-w-md">
@@ -132,11 +108,11 @@ const AdminDetailsPage: React.FC = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Admin Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -152,22 +128,17 @@ const AdminDetailsPage: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {admin.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {admin.role}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        admin.status === 'Active' 
-                          ? 'bg-emerald-100 text-emerald-800' 
+                    <td className="px-6 py-4 text-sm text-gray-900">{admin.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{admin.role}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${admin.status === 'Active'
+                          ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-red-100 text-red-800'
-                      }`}>
+                        }`}>
                         {admin.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900">
                       {new Date(admin.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
@@ -177,7 +148,7 @@ const AdminDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Add Admin Modal */}
+        {/* Add Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-6 w-full max-w-md">
@@ -189,7 +160,7 @@ const AdminDetailsPage: React.FC = () => {
                     type="text"
                     value={newAdmin.name}
                     onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
@@ -198,7 +169,7 @@ const AdminDetailsPage: React.FC = () => {
                     type="email"
                     value={newAdmin.email}
                     onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
@@ -216,20 +187,20 @@ const AdminDetailsPage: React.FC = () => {
                     type="password"
                     value={newAdmin.password}
                     onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
               </div>
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={handleAddAdmin}
-                  className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700"
                 >
                   Add Admin
                 </button>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
                 >
                   Cancel
                 </button>

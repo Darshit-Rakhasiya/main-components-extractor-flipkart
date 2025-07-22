@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { Shield, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
@@ -10,21 +9,30 @@ const AdminSignUpPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
-  const { signup, isLoading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     try {
-      const success = await signup(email, password, name, 'admin');
-      if (success) {
-        navigate('/admin/dashboard');
+      // Mock signup logic
+      const adminExists = false; // Replace with API logic
+
+      if (!adminExists) {
+        // Simulate network delay
+        setTimeout(() => {
+          setIsSubmitting(false);
+          navigate('/admin/dashboard');
+        }, 1000);
       } else {
+        setIsSubmitting(false);
         setError('Admin already exists');
       }
     } catch (err) {
+      setIsSubmitting(false);
       setError('Something went wrong. Please try again.');
     }
   };
@@ -104,10 +112,10 @@ const AdminSignUpPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
               >
-                {isLoading ? 'Creating account...' : 'Create Admin Account'}
+                {isSubmitting ? 'Creating account...' : 'Create Admin Account'}
               </button>
             </form>
 
@@ -118,7 +126,6 @@ const AdminSignUpPage: React.FC = () => {
               >
                 Already have an admin account? Sign in
               </Link>
-              {/* Add link for users */}
               <div>
                 <span className="text-gray-500 text-sm">Are you a regular user?</span>{' '}
                 <Link
@@ -141,7 +148,7 @@ const AdminSignUpPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
