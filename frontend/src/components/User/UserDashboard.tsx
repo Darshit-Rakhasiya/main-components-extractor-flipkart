@@ -11,10 +11,16 @@ import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+// --- Sample Payload Schema ---
+const SAMPLE_PAYLOAD_SCHEMA = {
+  url: "https://www.flipkart.com/ /p/ ?pid=ETHGYCK8ZQ2RJ8ET",
+  api: "DEF",
+};
+
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [currentStep, setCurrentStep] = useState(1);
   const [platform, setPlatform] = useState('');
   const [category, setCategory] = useState('');
@@ -25,7 +31,7 @@ const UserDashboard: React.FC = () => {
   const [keyResponse, setKeyResponse] = useState<any>(null);
   const [isTestingKey, setIsTestingKey] = useState(false);
 
-  /* ---------- API‑test state ---------- */
+  // API test state
   const [url, setUrl] = useState('');
   const [method, setMethod] = useState('GET');
   const [isValidating, setIsValidating] = useState(false);
@@ -56,7 +62,7 @@ const UserDashboard: React.FC = () => {
       status: 'Active'
     },
     {
-      id: '2', 
+      id: '2',
       name: 'Test Key',
       key: 'sk_test_51H7qXYZ987654321ABC',
       usage: 45,
@@ -82,15 +88,36 @@ const UserDashboard: React.FC = () => {
     window.history.replaceState(null, '', '/user/dashboard');
   };
 
+  // --- Payload schema helpers ---
+  const payloadArrayToObject = (arr: { key: string; value: string }[]) => {
+    const obj: Record<string, string> = {};
+    arr.forEach(({ key, value }) => {
+      if (key.trim()) obj[key.trim()] = value;
+    });
+    return obj;
+  };
+
+  const isPayloadSchemaValid = (userPayload: Record<string, string>, schema: Record<string, string>) => {
+    const userKeys = Object.keys(userPayload).sort();
+    const schemaKeys = Object.keys(schema).sort();
+    if (userKeys.length !== schemaKeys.length) return false;
+    return userKeys.every((k, i) => k === schemaKeys[i]);
+  };
+
+  // --- API Test logic with schema validation ---
   const validateAndFetchData = async () => {
     if (!url) {
       setError('Please enter the API URL');
+      setIsValid(false);
+      setApiResponse(null);
       return;
     }
     if (method === 'POST') {
       const hasKey = payload.some((row) => row.key.trim() !== '');
       if (!hasKey) {
         setError('Please enter at least one payload key-value pair');
+        setIsValid(false);
+        setApiResponse(null);
         return;
       }
     }
@@ -103,20 +130,35 @@ const UserDashboard: React.FC = () => {
     try {
       await new Promise((r) => setTimeout(r, 1000)); // faux latency
 
-      // Simulate a response
+      // Convert payload to object and validate schema
+      let schemaValid = true;
+      let payloadObj: Record<string, string> = {};
+      if (method === 'POST') {
+        payloadObj = payloadArrayToObject(payload);
+        schemaValid = isPayloadSchemaValid(payloadObj, SAMPLE_PAYLOAD_SCHEMA);
+      }
+
       setApiData([
         { id: 1, name: 'John Doe', email: 'john@example.com', status: 'active' },
         { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'inactive' },
       ]);
-      setIsValid(true);
+      setIsValid(schemaValid);
       setApiResponse({
+        connectionStatus: schemaValid ? 'Connected' : 'Not Connected',
+        success: schemaValid,
+        payload: payloadObj,
+        schema: SAMPLE_PAYLOAD_SCHEMA,
+        message: schemaValid
+          ? 'Your schema is matched. You can move forward.'
+          : 'Please correct your schema.',
         status: 200,
         method,
-        message: 'Success',
         timestamp: new Date().toISOString(),
       });
     } catch {
       setError('Failed to validate API. Please try again.');
+      setIsValid(false);
+      setApiResponse(null);
     } finally {
       setIsValidating(false);
     }
@@ -148,7 +190,7 @@ const UserDashboard: React.FC = () => {
 
     try {
       await new Promise((r) => setTimeout(r, 1000));
-      
+
       setKeyResponse({
         status: 200,
         message: 'API Key is valid',
@@ -170,7 +212,7 @@ const UserDashboard: React.FC = () => {
     navigate(`/user/dashboard/logs/${keyId}`);
   };
 
-  /* ---------- Render helpers ---------- */
+  // --- Render helpers ---
   const renderTable = () => {
     if (!apiData) return null;
     const headers = Object.keys(apiData[0] || {});
@@ -209,7 +251,7 @@ const UserDashboard: React.FC = () => {
 
   const handleLogout = () => navigate('/');
 
-  /* ---------- UI ---------- */
+  // --- UI ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       <Navbar isAuthenticated={false} onLogout={handleLogout} />
@@ -380,11 +422,42 @@ const UserDashboard: React.FC = () => {
               {/* Right side – response */}
               <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">API Response</h3>
-                
                 <div className="space-y-4">
-                  <InfoRow label="Connection Status" value={isValid ? 'Connected' : 'Not Connected'} valid={isValid} />
-                  <InfoRow label="API URL" value={url || 'Not set'} />
-                  
+                  <InfoRow
+                    label="Connection Status"
+                    value={apiResponse?.connectionStatus || (isValid ? 'Connected' : 'Not Connected')}
+                    valid={!!apiResponse?.success}
+                  />
+                  <InfoRow
+                    label="Success"
+                    value={typeof apiResponse?.success === 'boolean' ? apiResponse.success.toString() : '-'}
+                    valid={!!apiResponse?.success}
+                    accent={apiResponse?.success ? 'emerald' : 'red'}
+                  />
+                  <InfoRow
+                    label="Message"
+                    value={apiResponse?.message || "-"}
+                    valid={!!apiResponse?.success}
+                    accent={apiResponse?.success ? 'emerald' : 'red'}
+                  />
+                  {method === 'POST' && (
+                    <>
+                      <div>
+                        <div className="text-sm font-medium text-gray-700 mb-1">Payload</div>
+                        <pre className="bg-gray-100 rounded p-2 text-xs overflow-x-auto">
+                          {JSON.stringify(apiResponse?.payload || payloadArrayToObject(payload), null, 2)}
+                        </pre>
+                      </div>
+                      {!apiResponse?.success && (
+                        <div className="text-red-600 text-sm mb-2">
+                          Sample schema:
+                          <pre className="bg-gray-100 rounded p-2 text-xs mt-2 overflow-x-auto">
+                            {JSON.stringify(SAMPLE_PAYLOAD_SCHEMA, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                    </>
+                  )}
                   {apiResponse && (
                     <>
                       <InfoRow label="Status Code" value={apiResponse.status} valid={apiResponse.status === 200} />
@@ -431,9 +504,9 @@ const UserDashboard: React.FC = () => {
                   icon={Key}
                   placeholder="Enter your API key"
                 />
-                
+
                 {error && <Alert msg={error} Icon={AlertCircle} color="red" className="mt-4" />}
-                
+
                 <Button onClick={testApiKey} disabled={isTestingKey} className="mt-4">
                   <Send className="w-5 h-5" />
                   {isTestingKey ? 'Testing Key...' : 'Test API Key'}
@@ -489,8 +562,8 @@ const UserDashboard: React.FC = () => {
                         <td className="px-6 py-4 text-sm text-gray-900">{key.limit.toLocaleString()}</td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            key.status === 'Active' 
-                              ? 'bg-emerald-100 text-emerald-800' 
+                            key.status === 'Active'
+                              ? 'bg-emerald-100 text-emerald-800'
                               : 'bg-red-100 text-red-800'
                           }`}>
                             {key.status}
@@ -584,7 +657,7 @@ const InfoRow: React.FC<{
   label: string;
   value: string;
   valid?: boolean;
-  accent?: 'emerald' | 'blue';
+  accent?: 'emerald' | 'blue' | 'red';
 }> = ({ label, value, valid = false, accent = 'gray' }) => (
   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-2">
     <span className="text-sm font-medium text-gray-700">{label}</span>
