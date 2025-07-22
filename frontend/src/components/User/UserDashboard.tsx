@@ -249,12 +249,15 @@ const UserDashboard: React.FC = () => {
     );
   };
 
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => {
+    // Add your logout logic here (e.g., clear tokens, redirect, etc.)
+    navigate('/');
+  };
 
   // --- UI ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-      <Navbar isAuthenticated={false} onLogout={handleLogout} />
+      <Navbar isAuthenticated={true} onLogout={handleLogout} />
 
       {/* main container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
