@@ -23,7 +23,7 @@ interface ApiKeyData {
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {

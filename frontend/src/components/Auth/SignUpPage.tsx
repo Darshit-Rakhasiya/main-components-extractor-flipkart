@@ -3,7 +3,6 @@ import { UserPlus, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
-import toast from 'react-hot-toast';
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -25,18 +24,22 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
+    console.log(name, email, password, confirmPassword);
+    
 
-    // Simulate backend delay
-    setTimeout(() => {
-      if (false) {
-        setError('User already exists');
-      } else {
-        toast.success('Account created successfully!');
-        navigate('/user/dashboard?step=2');
-      }
-      setIsLoading(false);
-    }, 1000);
+    // setIsLoading(true);
+
+    // setTimeout(() => {
+    //   if (false) {
+    //     setError('User already exists');
+    //   } else {
+    //     toast.success('Account created successfully!');
+    //     navigate('/user/dashboard?step=2');
+    //   }
+    //   setIsLoading(false);
+    // }, 1000);
+
+
   };
 
   return (
@@ -77,7 +80,7 @@ const SignUpPage: React.FC = () => {
                   <input
                     type="email"
                     required
-                    value={email}
+                    value={email.toLowerCase()}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
