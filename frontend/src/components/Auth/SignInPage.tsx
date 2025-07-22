@@ -4,27 +4,79 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const SignInPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [signInData, setSignInData] = useState({
+    email: "",
+    password: ""
+  })
   const navigate = useNavigate();
+
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    const { name, value } = e.target;
+    setSignInData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (true) {
-        toast.success('Welcome back!');
+    try {
+      console.log(signInData);
+
+      const userResponse = await axios.post('http://localhost:3000/user/login', signInData);
+      if (userResponse.status === 200) {
+        toast.success('Logged in as User successfully!', {
+          position: 'top-center',
+          duration: 3000,
+        });
+        setSignInData({ email: '', password: '' });
         navigate('/user/dashboard');
+        return; // Exit early as user login was successful
       }
-      setIsLoading(false);
-    }, 1000);
+
+      // If user login fails, try admin login
+      const adminResponse = await axios.post('http://localhost:3000/admin/login', signInData);
+      if (adminResponse.status === 200) {
+        toast.success('Logged in as Admin successfully!', {
+          position: 'top-center',
+          duration: 3000,
+        });
+        setSignInData({ email: '', password: '' });
+        navigate('/admin/dashboard');
+        return; // Exit early as admin login was successful
+      }
+
+      // If both user and admin logins fail, try super admin login
+      const superAdminResponse = await axios.post('http://localhost:3000/super/login', signInData);
+      if (superAdminResponse.status === 200) {
+        toast.success('Logged in as Super Admin successfully!', {
+          position: 'top-center',
+          duration: 3000,
+        });
+        setSignInData({ email: '', password: '' });
+        navigate('/super/dashboard');
+        return; // Exit early as super admin login was successful
+      }
+
+      // If all attempts fail, set error message
+      setError('Invalid credentials. Please try again.');
+
+    } catch (err) {
+      // Catch any error during the requests (network error, etc.)
+      console.error('Login error:', err);
+      setError('Failed to log in. Please try again.');
+    } finally {
+      setIsLoading(false); // Reset loading state once all attempts are done
+    }
   };
 
   return (
@@ -51,9 +103,10 @@ const SignInPage: React.FC = () => {
                   <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
+                    name='email'
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signInData.email.toLowerCase()}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
                   />
@@ -69,8 +122,9 @@ const SignInPage: React.FC = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signInData.password}
+                    name='password'
+                    onChange={handleChange}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your password"
                   />

@@ -12,7 +12,7 @@ const SignUpPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [signInData, setSignInData] = useState({
+  const [signUpData, setSignUpData] = useState({
     name: '',
     email: '',
     password: '',
@@ -23,7 +23,7 @@ const SignUpPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSignInData((prevData) => ({
+    setSignUpData((prevData) => ({
       ...prevData,
       [name]: value
     }));
@@ -33,7 +33,7 @@ const SignUpPage: React.FC = () => {
     e.preventDefault();
     setError('');
 
-    if (signInData.password !== signInData.confirmPassword) {
+    if (signUpData.password !== signUpData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
@@ -41,14 +41,14 @@ const SignUpPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/user/register', signInData);
+      const response = await axios.post('http://localhost:3000/user/register', signUpData);
 
       if (response.data.success) {
         toast.success('Account created successfully!', {
           position: 'top-center',
           duration: 4500
         });
-        setSignInData({ name: '', email: '', password: '', confirmPassword: '' });
+        setSignUpData({ name: '', email: '', password: '', confirmPassword: '' });
         navigate('/signin');
       }
     } catch (err) {
@@ -83,7 +83,7 @@ const SignUpPage: React.FC = () => {
                     type="text"
                     name="name"
                     required
-                    value={signInData.name}
+                    value={signUpData.name}
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
@@ -99,7 +99,7 @@ const SignUpPage: React.FC = () => {
                     type="email"
                     name="email"
                     required
-                    value={signInData.email}
+                    value={signUpData.email}
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
@@ -115,7 +115,7 @@ const SignUpPage: React.FC = () => {
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     required
-                    value={signInData.password}
+                    value={signUpData.password}
                     onChange={handleChange}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your password"
@@ -138,7 +138,7 @@ const SignUpPage: React.FC = () => {
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
                     required
-                    value={signInData.confirmPassword}
+                    value={signUpData.confirmPassword}
                     onChange={handleChange}
                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="Confirm your password"
@@ -151,7 +151,7 @@ const SignUpPage: React.FC = () => {
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                {signInData.password && signInData.confirmPassword && signInData.password !== signInData.confirmPassword && (
+                {signUpData.password && signUpData.confirmPassword && signUpData.password !== signUpData.confirmPassword && (
                   <p className="text-red-600 text-sm mt-1">Passwords do not match</p>
                 )}
               </div>
