@@ -86,7 +86,7 @@ const GenerateKeyPage: React.FC = () => {
     }
 
     const selectedUser = users.find(u => u.name.toLowerCase() === formData.assignedTo.toLowerCase());
-    if (!selectedUser) return;
+    // if (!selectedUser) return;
 
     if (!formData.database || !formData.collection) {
     alert("Please enter both database and collection names.");
@@ -95,8 +95,8 @@ const GenerateKeyPage: React.FC = () => {
     const newKey: GeneratedKey = {
       id: Date.now().toString(),
       keyValue: generateApiKey(),
-      assignedTo: selectedUser.name,
-      assignedType: selectedUser.type,
+      assignedTo:formData.assignedTo,
+      assignedType: selectedUser?.type || 'User',
       limit: formData.limit,
       usage: 0,
       status: formData.status,
