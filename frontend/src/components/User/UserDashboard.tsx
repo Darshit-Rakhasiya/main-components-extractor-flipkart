@@ -472,9 +472,6 @@ const UserDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Data table */}
-            {renderTable()}
-
             {/* Navigation buttons at bottom */}
             <div className="flex space-x-3 mt-8">
               <button
@@ -483,7 +480,11 @@ const UserDashboard: React.FC = () => {
               >
                 ← Back to Step 1
               </button>
-              <Button onClick={goToStep3} className="flex-1">
+              <Button
+                onClick={goToStep3}
+                className="flex-1"
+                disabled={!apiResponse?.success}
+              >
                 Next Step →
               </Button>
             </div>
