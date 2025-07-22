@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Globe,
   Send,
@@ -8,32 +8,13 @@ import {
 } from 'lucide-react';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-
-interface ApiKeyData {
-  id: string;
-  name: string;
-  key: string;
-  limit: number;
-  usage: number;
-  status: 'Active' | 'Inactive' | 'Expired';
-  createdAt: string;
-}
+import { useNavigate } from 'react-router-dom';
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  
   const [currentStep, setCurrentStep] = useState(1);
-
-  useEffect(() => {
-    const step = searchParams.get('step');
-    if (step === '2') {
-      setCurrentStep(2);
-    }
-  }, [searchParams]);
-
-  /* ---------- Step & form state ---------- */
   const [platform, setPlatform] = useState('');
   const [category, setCategory] = useState('');
   const [type, setType] = useState('PDP');
@@ -160,7 +141,6 @@ const UserDashboard: React.FC = () => {
   };
 
   const handleLogout = () => navigate('/');
-  const handleViewLogs = (id: string) => navigate(`/user/logs/${id}`);
 
   /* ---------- UI ---------- */
   return (
