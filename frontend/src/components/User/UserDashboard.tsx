@@ -22,7 +22,7 @@ const UserDashboard: React.FC = () => {
   const [database, setDatabase] = useState('');
   const [collection, setCollection] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [keyResponse, setKeyResponse] = useState(null);
+  const [keyResponse, setKeyResponse] = useState<any>(null);
   const [isTestingKey, setIsTestingKey] = useState(false);
 
   /* ---------- API‑test state ---------- */
@@ -250,44 +250,52 @@ const UserDashboard: React.FC = () => {
 
         {/* STEP 1 --------------- */}
         {currentStep === 1 && (
-          <div className="bg-white/80 backdrop-blur-md rounded-xl p-8 border mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">API Configuration</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Input label="Platform *" value={platform} onChange={setPlatform} placeholder="Enter platform name" />
-              <Input label="Category *" value={category} onChange={setCategory} placeholder="Enter category" />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                >
-                  {[
-                    { v: 'PL', l: 'Product Listing (PL)' },
-                    { v: 'PDP', l: 'Product Detail Page (PDP)' },
-                    { v: 'SEARCH', l: 'Search Results' },
-                    { v: 'REVIEW', l: 'Product Reviews' },
-                  ].map(({ v, l }) => (
-                    <option key={v} value={v}>
-                      {l}
-                    </option>
-                  ))}
-                </select>
+          <>
+            <div className="bg-white/80 backdrop-blur-md rounded-xl p-8 border mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">API Configuration</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Input label="Platform *" value={platform} onChange={setPlatform} placeholder="Enter platform name" />
+                <Input label="Category *" value={category} onChange={setCategory} placeholder="Enter category" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    {[
+                      { v: 'PL', l: 'Product Listing (PL)' },
+                      { v: 'PDP', l: 'Product Detail Page (PDP)' },
+                      { v: 'SEARCH', l: 'Search Results' },
+                      { v: 'REVIEW', l: 'Product Reviews' },
+                    ].map(({ v, l }) => (
+                      <option key={v} value={v}>
+                        {l}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Input label="Database *" value={database} onChange={setDatabase} placeholder="Enter database name" />
+                <Input label="Collection *" value={collection} onChange={setCollection} placeholder="Enter collection name" />
               </div>
-              <Input label="Database *" value={database} onChange={setDatabase} placeholder="Enter database name" />
-              <Input label="Collection *" value={collection} onChange={setCollection} placeholder="Enter collection name" />
+
+              {error && (
+                <Alert msg={error} Icon={AlertCircle} color="red" className="mt-4" />
+              )}
             </div>
-
-            {error && (
-              <Alert msg={error} Icon={AlertCircle} color="red" className="mt-4" />
-            )}
-
-            <div className="mt-8 flex justify-end">
-              <Button onClick={() => (!platform || !category || !database || !collection ? setError('Please fill in all required fields') : goToStep2())}>
+            {/* Button OUTSIDE the box */}
+            <div className="flex justify-end mb-8">
+              <Button
+                onClick={() =>
+                  !platform || !category || !database || !collection
+                    ? setError('Please fill in all required fields')
+                    : goToStep2()
+                }
+              >
                 Next Step <ChevronDown className="w-4 h-4 -rotate-90" />
               </Button>
             </div>
-          </div>
+          </>
         )}
 
         {/* STEP 2 --------------- */}
@@ -334,6 +342,25 @@ const UserDashboard: React.FC = () => {
                         <button type="button" onClick={addPayloadRow} className="text-blue-600 text-xs">+ Add Row</button>
                       </div>
                     </div>
+                    {payload.map((row, idx) => (
+                      <div key={idx} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Key"
+                          value={row.key}
+                          onChange={e => handlePayloadChange(idx, 'key', e.target.value)}
+                          className="px-2 py-1 border rounded"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Value"
+                          value={row.value}
+                          onChange={e => handlePayloadChange(idx, 'value', e.target.value)}
+                          className="px-2 py-1 border rounded"
+                        />
+                        <button type="button" onClick={() => removePayloadRow(idx)} className="text-red-500">x</button>
+                      </div>
+                    ))}
                   </div>
                 )}
 
