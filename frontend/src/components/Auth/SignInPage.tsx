@@ -19,11 +19,9 @@ const SignInPage: React.FC = () => {
 
     // Dummy sign-in logic
     setTimeout(() => {
-      if (email === 'test@example.com' && password === 'password') {
+      if (true) {
         toast.success('Successfully signed in!');
         navigate('/user/dashboard');
-      } else {
-        setError('Invalid credentials');
       }
       setIsLoading(false);
     }, 1000); // Simulate async

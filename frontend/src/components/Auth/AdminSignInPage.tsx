@@ -17,14 +17,9 @@ const AdminSignInPage: React.FC = () => {
     setError('');
     setIsLoading(true);
 
-    // 👉 Replace this mock logic with your real API call
     setTimeout(() => {
-      if (email === 'admin@example.com' && password === 'admin123') {
-        toast.success('Successfully signed in as admin!');
-        navigate('/admin/dashboard');
-      } else {
-        setError('Invalid admin credentials');
-      }
+      toast.success('Successfully signed in as admin!');
+      navigate('/admin/dashboard');
       setIsLoading(false);
     }, 1000);
   };

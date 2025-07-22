@@ -21,7 +21,7 @@ const SignUpPage: React.FC = () => {
     // Simulate backend delay
     setTimeout(() => {
       // Dummy existing user check
-      if (email === 'test@example.com') {
+      if (false) {
         setError('User already exists');
       } else {
         toast.success('Account created successfully!');

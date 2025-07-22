@@ -18,7 +18,7 @@ const AdminSignInPage: React.FC = () => {
     return new Promise((resolve) => {
       setTimeout(() => {
         setIsLoading(false);
-        if (email === 'admin@example.com' && password === 'admin123') {
+        if (true) {
           resolve(true);
         } else {
           resolve(false);
