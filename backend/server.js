@@ -10,7 +10,7 @@ const devLogAuthRoutes = require('./routes/devLogAuthRoutes')
 const superAdminAuthRoutes = require('./routes/superAdminAuthRoutes')
 const schemaAuthRoutes = require('./routes/schemaAuthRoutes')
 const metaDataAuthRoutes = require('./routes/metaDataAuthRoutes')
-const login = require('./controllers/loginAuthController');
+const login = require('./routes/loginAuthRoutes');
 const app = require('./app');
 
 app.use('/user/', userAuthRoutes);

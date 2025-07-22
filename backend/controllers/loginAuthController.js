@@ -1,3 +1,9 @@
+const User = require('../models/User');
+const SuperAdmin = require('../models/SuperAdmin');
+const Admin = require("../models/Admin")
+const bcrypt = require('bcryptjs');
+const devLog = require("../models/DevLog")
+
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -6,7 +12,7 @@ exports.loginUser = async (req, res) => {
     }
 
     try {
-       
+
         let user = await SuperAdmin.findOne({ email });
         if (user) {
             const match = await bcrypt.compare(password, user.password);

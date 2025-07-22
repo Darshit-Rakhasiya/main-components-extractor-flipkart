@@ -32,52 +32,58 @@ const SignInPage: React.FC = () => {
     try {
       console.log(signInData);
 
-      const userResponse = await axios.post('http://localhost:3000/user/login', signInData);
-      if (userResponse.status === 200) {
-        toast.success('Logged in as User successfully!', {
-          position: 'top-center',
-          duration: 3000,
-        });
-        setSignInData({ email: '', password: '' });
-        navigate('/user/dashboard');
-        return; // Exit early as user login was successful
-      }
+      // Make a single request to the new login endpoint
+      const response = await axios.post('http://localhost:3000/login', signInData);
 
-      // If user login fails, try admin login
-      const adminResponse = await axios.post('http://localhost:3000/admin/login', signInData);
-      if (adminResponse.status === 200) {
-        toast.success('Logged in as Admin successfully!', {
-          position: 'top-center',
-          duration: 3000,
-        });
-        setSignInData({ email: '', password: '' });
-        navigate('/admin/dashboard');
-        return; // Exit early as admin login was successful
-      }
+      console.log(response);
+      
 
-      // If both user and admin logins fail, try super admin login
-      const superAdminResponse = await axios.post('http://localhost:3000/super/login', signInData);
-      if (superAdminResponse.status === 200) {
-        toast.success('Logged in as Super Admin successfully!', {
-          position: 'top-center',
-          duration: 3000,
-        });
-        setSignInData({ email: '', password: '' });
-        navigate('/super/dashboard');
-        return; // Exit early as super admin login was successful
-      }
+      if (response.status === 200 && response.data.status) {
+        const { role } = response.data;
 
-      // If all attempts fail, set error message
-      setError('Invalid credentials. Please try again.');
+        switch (role) {
+          case 'user':
+            toast.success('Logged in as User successfully!', {
+              position: 'top-center',
+              duration: 3000,
+            });
+            navigate('/user/dashboard');
+            break;
+          case 'admin':
+            toast.success('Logged in as Admin successfully!', {
+              position: 'top-center',
+              duration: 3000,
+            });
+            navigate('/admin/dashboard');
+            break;
+          case 'super':
+            toast.success('Logged in as Super Admin successfully!', {
+              position: 'top-center',
+              duration: 3000,
+            });
+            navigate('/super/dashboard');
+            break;
+          default:
+            setError('Unknown role. Please contact support.');
+            break;
+        }
+
+        setSignInData({ email: '', password: '' });
+        return; // Exit early after successful login
+
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
 
     } catch (err) {
-      // Catch any error during the requests (network error, etc.)
-      console.error('Login error:', err);
+      // Catch any error during the request (network error, etc.)
+      // console.error('Login error:', err);
       setError('Failed to log in. Please try again.');
     } finally {
       setIsLoading(false); // Reset loading state once all attempts are done
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
