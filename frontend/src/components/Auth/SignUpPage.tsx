@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const SignUpPage: React.FC = () => {
   const [error, setError] = useState('');
@@ -38,37 +38,16 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    console.log(signInData);
-
     axios.post("http://localhost:3000/user/register", signInData)
       .then((res) => {
         console.log(res.data);
-        toast.success("User Registered", {
-          position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true, 
-          pauseOnHover: true, 
-          draggable: true,
-        });
+        toast.success("Account created successfully!");
+        navigate('/user/dashboard?step=2');
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Registration failed. Please try again.");
       })
-
-    // setIsLoading(true);
-
-    // setTimeout(() => {
-    //   if (false) {
-    //     setError('User already exists');
-    //   } else {
-    //     toast.success('Account created successfully!');
-    //     navigate('/user/dashboard?step=2');
-    //   }
-    //   setIsLoading(false);
-    // }, 1000);
-
-
   };
 
   return (
