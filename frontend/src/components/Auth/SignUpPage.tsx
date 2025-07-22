@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 const SignUpPage: React.FC = () => {
   const [error, setError] = useState('');
@@ -38,37 +38,25 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    console.log(signInData);
+    setIsLoading(true);
 
-    axios.post("http://localhost:3000/user/register", signInData)
-      .then((res) => {
-        console.log(res.data);
-        toast.success("User Registered", {
+    try {
+      const response = await axios.post('http://localhost:3000/user/register', signInData);
+
+      if (response.data.success) {
+        toast.success('Account created successfully!', {
           position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true, 
-          pauseOnHover: true, 
-          draggable: true,
+          duration: 4500
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-
-    // setIsLoading(true);
-
-    // setTimeout(() => {
-    //   if (false) {
-    //     setError('User already exists');
-    //   } else {
-    //     toast.success('Account created successfully!');
-    //     navigate('/user/dashboard?step=2');
-    //   }
-    //   setIsLoading(false);
-    // }, 1000);
-
-
+        setSignInData({ name: '', email: '', password: '', confirmPassword: '' });
+        navigate('/signin');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to create account. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
