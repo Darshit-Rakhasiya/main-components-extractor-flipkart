@@ -21,7 +21,7 @@ const SignInPage: React.FC = () => {
     setTimeout(() => {
       if (true) {
         toast.success('Welcome back!');
-        navigate('/user/dashboard?step=2');
+        navigate('/user/dashboard');
       }
       setIsLoading(false);
     }, 1000);

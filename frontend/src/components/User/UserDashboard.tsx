@@ -42,7 +42,7 @@ const UserDashboard: React.FC = () => {
   // Step navigation with URL update
   const goToStep2 = () => {
     setCurrentStep(2);
-    window.history.replaceState(null, '', '/user/dashboard?step2');
+    window.history.replaceState(null, '', '/user/dashboard?step=2');
   };
   const goToStep1 = () => {
     setCurrentStep(1);
