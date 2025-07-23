@@ -15,7 +15,7 @@ import UserLogsPage from './components/User/UserLogsPage';
 
 // Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
-import ConfigApiPage from './components/Admin/configApi';
+import ConfigApiPage from './components/Admin/ConfigApi';
 import ApiListingPage from './components/Admin/ApiListingPage';
 // import UserDetailsPage from './components/Admin/UserDetailsPage';
 // import UsageKeyDetailsPage from './components/Admin/UsageKeyDetailsPage';
