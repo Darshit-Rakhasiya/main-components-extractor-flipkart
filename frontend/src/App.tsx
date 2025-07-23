@@ -22,7 +22,6 @@ import UsageKeyDetailsPage from './components/Admin/UsageKeyDetailsPage';
 import GenerateKeyPage from './components/Admin/GenerateKeyPage';
 import UpdateKeyTablePage from './components/Admin/UpdateKeyTablePage';
 import SettingsPage from './components/Admin/SettingsPage';
-import ProtectedRoute from './ProtectedRoute';
 
 const App: React.FC = () => {
   return (
@@ -30,27 +29,25 @@ const App: React.FC = () => {
       <Toaster position="top-right" />
       <Routes>
         {/* Public Routes */}
-        {/* <Route path="/" element={<UserHomePage />} /> */}
-        <Route path="/" element={<SignInPage />} />
+        <Route path="/" element={<UserHomePage />} />
 
         {/* Auth Routes */}
-        {/* <Route path="/signin" element={<SignInPage />} />
-        <Route path="/signup" element={<SignUpPage />} /> */}
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
 
         {/* User Pages */}
-        <Route path="/user/dashboard" element={<ProtectedRoute allowedRoles={['user']}>
-          <UserDashboard /></ProtectedRoute>} />
+        <Route path="/user/dashboard" element={<UserDashboard />} />
         <Route path="/user/dashboard/logs/:keyId" element={<UserLogsPage />} />
 
         {/* Admin Pages */}
-        {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/request-log" element={<RequestLogPage />} />
         <Route path="/admin/admin-details" element={<AdminDetailsPage />} />
         <Route path="/admin/user-details" element={<UserDetailsPage />} />
         <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} />
         <Route path="/admin/generate-key" element={<GenerateKeyPage />} />
         <Route path="/admin/update-key-table" element={<UpdateKeyTablePage />} />
-        <Route path="/admin/settings" element={<SettingsPage />} /> */}
+        <Route path="/admin/settings" element={<SettingsPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

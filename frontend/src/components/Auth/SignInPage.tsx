@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, Lock, ArrowLeft, User, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-// import Navbar from '../Common/Navbar';
-// import Footer from '../Common/Footer';
+import Navbar from '../Common/Navbar';
+import Footer from '../Common/Footer';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
 
 const SignInPage: React.FC = () => {
   const [error, setError] = useState('');
@@ -25,8 +24,6 @@ const SignInPage: React.FC = () => {
     }));
   }
 
-  const { login } = useAuth()
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -45,8 +42,6 @@ const SignInPage: React.FC = () => {
         const { role } = response.data;
         const { email } = response.data.data.email;
         const { username } = response.data.data.username;
-
-        login({ role, email, username })
 
         switch (role) {
           case 'user':
@@ -94,8 +89,7 @@ const SignInPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-      {/* <Navbar /> */}
-      {/* <NavbarDummy /> */}
+      <Navbar />
 
       <div className="flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
@@ -189,7 +183,7 @@ const SignInPage: React.FC = () => {
         </div>
       </div>
 
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };
