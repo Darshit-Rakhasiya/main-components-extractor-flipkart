@@ -14,13 +14,11 @@ const ConfigApi: React.FC = () => {
   const [type, setType] = useState('');
   const [response, setResponse] = useState<{ success: boolean; message: string } | null>(null);
 
-  // Manage the payload (key-value pairs)
   const [payload, setPayload] = useState<{ key: string; value: string }[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Prepare the form data
     const formData = {
       apiUrl,
       method,
@@ -31,17 +29,15 @@ const ConfigApi: React.FC = () => {
       domainName,
       category,
       type,
-      payload,  // Make sure payload is included
+      payload,
     };
 
     console.log(formData);
 
 
     try {
-      // Send POST request to the server using axios
       const apiResponse = await axios.post('http://localhost:3000/meta/submit', formData);
 
-      // Handle the response from the server
       setResponse({
         success: apiResponse.data.success,
         message: apiResponse.data.message,
@@ -75,12 +71,10 @@ const ConfigApi: React.FC = () => {
   return (
     <AdminLayout pageTitle="API Configuration">
       <div className="space-y-6">
-        {/* Form Container */}
         <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* API URL Field */}
               <div className="relative">
                 <input
                   type="url"
@@ -91,7 +85,6 @@ const ConfigApi: React.FC = () => {
                 />
               </div>
 
-              {/* Method Field */}
               <div className="relative">
                 <select
                   value={method}
@@ -108,7 +101,6 @@ const ConfigApi: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* MongoDB URL Field */}
               <div className="relative">
                 <input
                   type="url"
@@ -119,7 +111,6 @@ const ConfigApi: React.FC = () => {
                 />
               </div>
 
-              {/* Database Name Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -133,7 +124,6 @@ const ConfigApi: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* Key Collection Name Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -144,7 +134,6 @@ const ConfigApi: React.FC = () => {
                 />
               </div>
 
-              {/* Log Collection Name Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -158,7 +147,6 @@ const ConfigApi: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* Domain Name Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -169,7 +157,6 @@ const ConfigApi: React.FC = () => {
                 />
               </div>
 
-              {/* Category Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -183,7 +170,6 @@ const ConfigApi: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* Type Field */}
               <div className="relative">
                 <input
                   type="text"
@@ -195,7 +181,6 @@ const ConfigApi: React.FC = () => {
               </div>
             </div>
 
-            {/* Payload Section (conditional for POST) */}
             {method === 'POST' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-700">Payload</h3>
@@ -234,7 +219,6 @@ const ConfigApi: React.FC = () => {
               </div>
             )}
 
-            {/* Submit Button */}
             <div className="flex justify-end mt-6">
               <button
                 type="submit"
@@ -244,7 +228,6 @@ const ConfigApi: React.FC = () => {
               </button>
             </div>
 
-            {/* Response Section */}
             {response && (
               <div className={`mt-6 p-4 rounded-lg ${response.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                 <h4 className="font-semibold text-lg">
