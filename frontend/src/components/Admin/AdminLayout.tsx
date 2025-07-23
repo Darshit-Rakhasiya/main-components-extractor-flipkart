@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
+import { useAuth } from '../../context/AuthContext';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -9,12 +10,17 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, pageTitle }) => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Placeholder logout action
-    navigate('/admin-home');
+    logout();
+    navigate('/'); 
   };
+
+  if (!user) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex">
@@ -31,7 +37,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, pageTitle }) => {
                 <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-900">Admin</span>
+                <span className="text-sm font-medium text-gray-900">{user.username || "Admin"}</span>
               </div>
 
               <button

@@ -12,7 +12,7 @@ interface Admin {
   createdAt: string;
 }
 
-const AdminDetailsPage: React.FC = () => {
+const ApiListingPage: React.FC = () => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [filteredAdmins, setFilteredAdmins] = useState<Admin[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -248,4 +248,4 @@ const AdminDetailsPage: React.FC = () => {
   );
 };
 
-export default AdminDetailsPage;
+export default ApiListingPage;

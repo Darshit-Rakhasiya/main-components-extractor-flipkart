@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 
 // Home Pages
-import UserHomePage from './components/Home/UserHomePage';
+// import UserHomePage from './components/Home/UserHomePage';
 
 // Auth Pages
 import SignInPage from './components/Auth/SignInPage';
-import SignUpPage from './components/Auth/SignUpPage';
+// import SignUpPage from './components/Auth/SignUpPage';
 
 // User Components
 import UserDashboard from './components/User/UserDashboard';
@@ -15,13 +15,13 @@ import UserLogsPage from './components/User/UserLogsPage';
 
 // Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
-import RequestLogPage from './components/Admin/RequestLogPage';
-import AdminDetailsPage from './components/Admin/AdminDetailsPage';
-import UserDetailsPage from './components/Admin/UserDetailsPage';
-import UsageKeyDetailsPage from './components/Admin/UsageKeyDetailsPage';
-import GenerateKeyPage from './components/Admin/GenerateKeyPage';
-import UpdateKeyTablePage from './components/Admin/UpdateKeyTablePage';
-import SettingsPage from './components/Admin/SettingsPage';
+import ConfigApiPage from './components/Admin/configApi';
+import ApiListingPage from './components/Admin/ApiListingPage';
+// import UserDetailsPage from './components/Admin/UserDetailsPage';
+// import UsageKeyDetailsPage from './components/Admin/UsageKeyDetailsPage';
+// import GenerateKeyPage from './components/Admin/GenerateKeyPage';
+// import UpdateKeyTablePage from './components/Admin/UpdateKeyTablePage';
+// import SettingsPage from './components/Admin/SettingsPage';
 import ProtectedRoute from './ProtectedRoute';
 
 const App: React.FC = () => {
@@ -43,9 +43,9 @@ const App: React.FC = () => {
         <Route path="/user/dashboard/logs/:keyId" element={<UserLogsPage />} />
 
         {/* Admin Pages */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/request-log" element={<RequestLogPage />} />
-        <Route path="/admin/admin-details" element={<AdminDetailsPage />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['user']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/config-api" element={<ConfigApiPage />} />
+        <Route path="/admin/api-listing" element={<ApiListingPage />} />
         {/* <Route path="/admin/user-details" element={<UserDetailsPage />} /> */}
         {/* <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} /> */}
         {/* <Route path="/admin/generate-key" element={<GenerateKeyPage />} /> */}

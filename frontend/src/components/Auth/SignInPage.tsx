@@ -33,28 +33,22 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log(signInData);
-
-      // Make a single request to the new login endpoint
       const response = await axios.post('http://localhost:3000/login', signInData);
-
-      console.log(response);
-
 
       if (response.status === 200 && response.data.status) {
         const { role } = response.data;
-        const { email } = response.data.data.email;
-        const { username } = response.data.data.username;
+        const { email, username } = response.data.data;
+
 
         login({ role, email, username })
 
         switch (role) {
           case 'user':
-            toast.success('Logged in as User successfully!', {
+            toast.success('Logged in as Admin successfully!', {
               position: 'top-center',
               duration: 3000,
             });
-            navigate('/user/dashboard');
+            navigate('/admin/dashboard');
             break;
           case 'admin':
             toast.success('Logged in as Admin successfully!', {
@@ -167,24 +161,6 @@ const SignInPage: React.FC = () => {
               </button>
             </form>
 
-            <div className="mt-6 text-center space-y-4">
-              <Link
-                to="/signup"
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-              >
-                Don't have an account? Sign up
-              </Link>
-
-              <div className="flex items-center justify-center space-x-2">
-                <ArrowLeft className="w-4 h-4 text-gray-400" />
-                <Link
-                  to="/"
-                  className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
-                >
-                  Back to home
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -8,7 +8,8 @@ import {
   Key,
   Database,
   Settings,
-  Plus
+  Plus,
+  List
 } from 'lucide-react';
 
 const AdminSidebar: React.FC = () => {
@@ -16,13 +17,13 @@ const AdminSidebar: React.FC = () => {
 
   const menuItems = [
     { path: '/admin/dashboard', icon: BarChart3, label: 'Dashboard' },
-    { path: '/admin/request-log', icon: FileText, label: 'Request Log' },
-    { path: '/admin/admin-details', icon: Shield, label: 'Admin Details' },
-    { path: '/admin/user-details', icon: Users, label: 'User Details' },
-    { path: '/admin/usage-key-details', icon: Key, label: 'Usage Key Details' },
-    { path: '/admin/generate-key', icon: Plus, label: 'Generate Key Table' },
-    { path: '/admin/update-key-table', icon: Database, label: 'Update Key Table' },
-    { path: '/admin/settings', icon: Settings, label: 'Settings' },
+    { path: '/admin/config-api', icon: Settings, label: 'Config API' },
+    { path: '/admin/api-listing', icon: List, label: 'Api Listing' },
+    // { path: '/admin/user-details', icon: Users, label: 'User Details' },
+    // { path: '/admin/usage-key-details', icon: Key, label: 'Usage Key Details' },
+    // { path: '/admin/generate-key', icon: Plus, label: 'Generate Key Table' },
+    // { path: '/admin/update-key-table', icon: Database, label: 'Update Key Table' },
+    // { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (

@@ -17,6 +17,9 @@ exports.submitMetadata = async (req, res) => {
         type
     } = req.body;
 
+    console.log(req.body);
+
+
     if (!apiUrl || !method || !mongoDbUrl || !databaseName || !keyCollectionName || !logCollectionName || !domainName || !category || !type) {
         return res.status(400).json({
             success: false,
@@ -28,7 +31,7 @@ exports.submitMetadata = async (req, res) => {
 
     let client;
     try {
-        client = new MongoClient(mongoDbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+        client = new MongoClient(mongoDbUrl);
         await client.connect();
 
         const adminDb = client.db().admin();
@@ -51,7 +54,6 @@ exports.submitMetadata = async (req, res) => {
             return res.status(400).json({ success: false, message: `Log collection "${logCollectionName}" does not exist.` });
         }
 
-        // ✅ Key collection schema validation
         const sampleKeyDoc = await db.collection(keyCollectionName).findOne();
         if (!sampleKeyDoc) {
             return res.status(400).json({ success: false, message: `Key collection "${keyCollectionName}" has no documents.` });
@@ -68,7 +70,6 @@ exports.submitMetadata = async (req, res) => {
             });
         }
 
-        // ✅ Log collection schema validation
         const sampleLogDoc = await db.collection(logCollectionName).findOne();
         if (!sampleLogDoc) {
             return res.status(400).json({ success: false, message: `Log collection "${logCollectionName}" has no documents.` });
@@ -85,7 +86,14 @@ exports.submitMetadata = async (req, res) => {
             });
         }
 
-        // ✅ Insert metadata only if all checks passed
+        if (!['POST', 'GET', 'PUT', 'DELETE'].includes(method)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid HTTP method "${method}" specified.`,
+            });
+        }
+
+
         const metadata = await Metadata.create({
             apiUrl,
             apiName,
