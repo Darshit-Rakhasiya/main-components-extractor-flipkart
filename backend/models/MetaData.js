@@ -1,12 +1,47 @@
 const mongoose = require('mongoose');
 
 const metadataSchema = new mongoose.Schema({
-    platform: String,
-    category: String,
-    type: String,
-    database: String,
-    collection: String,
-    
+    apiUrl: {
+        type: String,
+        required: true
+    },
+    apiName: {
+        type: String,
+        required: true
+    },
+    method: {
+        type: String,
+        required: true,
+        enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+    },
+    mongoDbUrl: {
+        type: String,
+        required: true
+    },
+    databaseName: {
+        type: String,
+        required: true
+    },
+    keyCollectionName: {
+        type: String,
+        required: true
+    },
+    logCollectionName: {
+        type: String,
+        required: true
+    },
+    domainName: {
+        type: String,
+        required: true
+    },
+    category: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Metadata', metadataSchema);
