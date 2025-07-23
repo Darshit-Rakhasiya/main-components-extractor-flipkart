@@ -43,14 +43,14 @@ const App: React.FC = () => {
         <Route path="/user/dashboard/logs/:keyId" element={<UserLogsPage />} />
 
         {/* Admin Pages */}
-        {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/request-log" element={<RequestLogPage />} />
-        <Route path="/admin/admin-details" element={<AdminDetailsPage />} />
-        <Route path="/admin/user-details" element={<UserDetailsPage />} />
-        <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} />
-        <Route path="/admin/generate-key" element={<GenerateKeyPage />} />
-        <Route path="/admin/update-key-table" element={<UpdateKeyTablePage />} />
-        <Route path="/admin/settings" element={<SettingsPage />} /> */}
+         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        {/* <Route path="/admin/request-log" element={<RequestLogPage />} /> */}
+        {/* <Route path="/admin/admin-details" element={<AdminDetailsPage />} /> */}
+        {/* <Route path="/admin/user-details" element={<UserDetailsPage />} /> */}
+        {/* <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} /> */}
+        {/* <Route path="/admin/generate-key" element={<GenerateKeyPage />} /> */}
+        {/* <Route path="/admin/update-key-table" element={<UpdateKeyTablePage />} /> */}
+        {/* <Route path="/admin/settings" element={<SettingsPage />} />  */}
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
