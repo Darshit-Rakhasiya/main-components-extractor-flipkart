@@ -2,6 +2,7 @@ const Metadata = require('../models/MetaData');
 const DevLog = require('../models/DevLog');
 const KeyModel = require('../models/Key');
 const LogModel = require('../models/Log');
+const User = require('../models/User')
 const { MongoClient } = require('mongodb');
 
 exports.submitMetadata = async (req, res) => {
@@ -157,32 +158,81 @@ exports.countMetadata = async (req, res) => {
 
 exports.fetchMetaData = async (req, res) => {
     try {
-        const Meta = await Metadata.find();
+        const { page = 1, limit = 10, search = '', category, apiName, method, status } = req.query;
+        const query = {};
 
-        await DevLog.create({ message: `All metadata retrieved` })
+        if (search) {
+            query.$or = [
+                { apiName: { $regex: search, $options: 'i' } },
+                { category: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Partial match filters for each field
+        if (category) {
+            query.category = { $regex: category, $options: 'i' };
+        }
+        if (apiName) {
+            query.apiName = { $regex: apiName, $options: 'i' };
+        }
+        if (method) {
+            query.method = method;
+        }
+        if (status !== undefined) {
+            query.status = status === 'true';
+        }
+
+        const total = await Metadata.countDocuments(query);
+        const meta = await Metadata.find(query)
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        await DevLog.create({ message: `Fetched ${meta.length} metadata records on page ${page}` });
 
         res.status(200).json({
             success: true,
-            Meta
+            data: meta,
+            total,
         });
     } catch (err) {
-        console.error(err);
+        console.error('Error in fetchMetaData:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
 exports.updateStatus = async (req, res) => {
+    const { apiName, status, userEmail } = req.body;
+
+    if (!apiName || typeof status !== 'boolean' || !userEmail) {
+        return res.status(400).json({ success: false, message: 'Missing or invalid parameters' });
+    }
+
     try {
-        const Meta = await Metadata.find();
+        const user = await User.findOne({ email: userEmail });
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-        await DevLog.create({ message: `All metadata retrieved` })
+        if (!user.updateAcess) {
+            await DevLog.create({ message: `Unauthorized update attempt by ${userEmail} on ${apiName}` });
+            return res.status(403).json({ success: false, message: 'User does not have permission to update' });
+        }
 
-        res.status(200).json({
-            success: true,
-            Meta
-        });
+        const existing = await Metadata.findOne({ apiName });
+        if (existing.status === status) {
+            return res.status(200).json({ success: true, message: 'No change needed' });
+        }
+
+
+        await Metadata.updateOne({ apiName }, { status });
+
+        await DevLog.create({ message: `User ${userEmail} updated ${apiName} to ${status}` });
+
+        res.json({ success: true, message: 'Status updated successfully' });
+
     } catch (err) {
-        console.error(err);
+        console.error('Error updating status:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};

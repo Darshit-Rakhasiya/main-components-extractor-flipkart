@@ -29,7 +29,7 @@ import MetaDetailPage from './components/Admin/MetaDetailPage';
 const App: React.FC = () => {
   return (
     <Router>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <Routes>
         {/* Public Routes */}
         {/* <Route path="/" element={<UserHomePage />} /> */}

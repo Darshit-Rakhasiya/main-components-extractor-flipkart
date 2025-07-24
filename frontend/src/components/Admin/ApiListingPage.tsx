@@ -2,64 +2,61 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 interface ApiItem {
   category?: string;
   apiName?: string;
   method?: string;
-  status?: boolean; // changed from Boolean to boolean for standard TypeScript type
+  status?: boolean;
 }
 
 const ApiListingPage: React.FC = () => {
+  const { user } = useAuth()
   const [data, setData] = useState<ApiItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     category: '',
-    name: '',
+    apiName: '',
     method: '',
     status: '',
   });
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 7;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get('http://localhost:3000/meta/fetch');
-        const fetched = res.data?.Meta || [];
-        setData(fetched);
-      } catch (err) {
-        console.error('Error fetching API metadata:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, []);
+  }, [currentPage, searchTerm, filters]);
 
-  const filteredData = data.filter((item) => {
-    const matchCategory = (item.category || '').toLowerCase().includes(filters.category.toLowerCase());
-    const matchName = (item.apiName || '').toLowerCase().includes(filters.name.toLowerCase());
-    const matchMethod = filters.method === '' || item.method === filters.method;
-    const matchStatus =
-      filters.status === '' ||
-      (filters.status === 'Active' && item.status === true) ||
-      (filters.status === 'Inactive' && item.status === false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get('http://localhost:3000/meta/fetch', {
+        params: {
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm,
+          category: filters.category,
+          apiName: filters.apiName,
+          method: filters.method,
+          status: filters.status === 'Active' ? 'true' : filters.status === 'Inactive' ? 'false' : undefined,
+        }
+      });
 
-    const globalMatch =
-      (item.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.apiName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.method || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.status !== undefined && (item.status ? 'active' : 'inactive').includes(searchTerm.toLowerCase()));
+      setData(res.data.data || []);
+      setTotalCount(res.data.total || 0);
+    } catch (err) {
+      console.error('Error fetching API metadata:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return matchCategory && matchName && matchMethod && matchStatus && globalMatch;
-  });
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -119,8 +116,8 @@ const ApiListingPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="API Name"
-                    value={filters.name}
-                    onChange={(e) => handleFilterChange('name', e.target.value)}
+                    value={filters.apiName}
+                    onChange={(e) => handleFilterChange('apiName', e.target.value)}
                     className="w-full px-2 py-1 border rounded-md"
                   />
                 </th>
@@ -160,17 +157,47 @@ const ApiListingPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((item, idx) => (
+              {data.map((item, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
                   <td className="px-4 py-2">{item.category || 'N/A'}</td>
                   <td className="px-4 py-2">{item.apiName || 'N/A'}</td>
                   <td className="px-4 py-2">{item.method || 'N/A'}</td>
                   <td className="px-4 py-2">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${item.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                    <select
+                      value={item.status ? 'Active' : 'Inactive'}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value === 'Active';
+
+                        try {
+                          const res = await axios.put(`http://localhost:3000/meta/update-status`, {
+                            apiName: item.apiName,
+                            status: newStatus,
+                            userEmail: user?.email,
+                          });
+
+                          if (res.data.success) {
+                            setData((prev) =>
+                              prev.map((d) =>
+                                d.apiName === item.apiName ? { ...d, status: newStatus } : d
+                              )
+                            );
+                            toast.success(`Status updated to ${e.target.value === "Active" ? "Inactive" : "Active"}`);
+                          } else {
+                            toast.error(res.data.message || 'Failed to update status');
+                          }
+                        } catch (err: any) {
+                          console.error('Status update failed:', err);
+                          toast.error(err?.response?.data?.message || 'Failed to update status');
+                        }
+                      }}
+                      className={`px-2 py-1 text-xs rounded-md border ${item.status
+                        ? 'bg-green-100 text-green-800 border-green-300'
+                        : 'bg-red-100 text-red-800 border-red-300'
+                        }`}
                     >
-                      {item.status ? 'Active' : 'Inactive'}
-                    </span>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
                   </td>
                   <td className="px-4 py-2">
                     <button
@@ -182,7 +209,7 @@ const ApiListingPage: React.FC = () => {
                   </td>
                 </tr>
               ))}
-              {paginatedData.length === 0 && (
+              {data.length === 0 && !loading && (
                 <tr>
                   <td colSpan={5} className="text-center py-4 text-gray-400">
                     No results found.
@@ -196,8 +223,8 @@ const ApiListingPage: React.FC = () => {
         {/* Pagination */}
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">
-            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}–
-            {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}
+            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}–
+            {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}
           </span>
           <div className="flex gap-2">
             <button

@@ -2,13 +2,8 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   BarChart3,
-  FileText,
   Shield,
-  Users,
-  Key,
-  Database,
   Settings,
-  Plus,
   List
 } from 'lucide-react';
 
