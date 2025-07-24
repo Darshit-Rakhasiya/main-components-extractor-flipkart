@@ -19,6 +19,7 @@ const AdminSidebar: React.FC = () => {
     { path: '/admin/dashboard', icon: BarChart3, label: 'Dashboard' },
     { path: '/admin/config-api', icon: Settings, label: 'Config API' },
     { path: '/admin/api-listing', icon: List, label: 'Api Listing' },
+    { path: '/admin/logs', icon: List, label: 'Logs' },
     // { path: '/admin/user-details', icon: Users, label: 'User Details' },
     // { path: '/admin/usage-key-details', icon: Key, label: 'Usage Key Details' },
     // { path: '/admin/generate-key', icon: Plus, label: 'Generate Key Table' },

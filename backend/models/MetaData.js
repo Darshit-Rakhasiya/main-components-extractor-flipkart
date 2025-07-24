@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 const metadataSchema = new mongoose.Schema({
     apiUrl: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     apiName: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     method: {
         type: String,

@@ -23,6 +23,7 @@ import ApiListingPage from './components/Admin/ApiListingPage';
 // import UpdateKeyTablePage from './components/Admin/UpdateKeyTablePage';
 // import SettingsPage from './components/Admin/SettingsPage';
 import ProtectedRoute from './ProtectedRoute';
+import Logs from './components/Admin/Logs';
 
 const App: React.FC = () => {
   return (
@@ -46,6 +47,7 @@ const App: React.FC = () => {
         <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['user']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/config-api" element={<ConfigApiPage />} />
         <Route path="/admin/api-listing" element={<ApiListingPage />} />
+        <Route path='/admin/logs' element={<Logs />} />
         {/* <Route path="/admin/user-details" element={<UserDetailsPage />} /> */}
         {/* <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} /> */}
         {/* <Route path="/admin/generate-key" element={<GenerateKeyPage />} /> */}

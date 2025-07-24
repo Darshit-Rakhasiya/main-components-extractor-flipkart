@@ -3,17 +3,30 @@ const devLog = require("../models/DevLog")
 
 exports.getAllLogs = async (req, res) => {
     try {
-        const logs = await Log.find();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page - 1) * limit;
 
-        await devLog.create({message: `All logs retrieved`})
+        const [logs, totalLogs] = await Promise.all([
+            Log.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Log.countDocuments()
+        ]);
+        
+        await devLog.create({
+            message: `All logs retrieved (Page: ${page}, Limit: ${limit})`
+        });
+        console.log(page, totalLogs);
 
         res.status(200).json({
             success: true,
+            logs,
             count: logs.length,
-            logs
+            totalLogs,
+            currentPage: page,
+            totalPages: Math.ceil(totalLogs / limit),
         });
     } catch (err) {
-        console.error(err);
+        console.error('Error retrieving logs:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
@@ -38,7 +51,7 @@ exports.insertLog = async (req, res) => {
 
         const savedLog = await newLog.save();
 
-        await devLog.create({message: `New Log inserted - IP:${ip} & API:${key}`})
+        await devLog.create({ message: `New Log inserted - IP:${ip} & API:${key}` })
 
         res.status(201).json({
             success: true,
