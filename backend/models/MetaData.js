@@ -43,6 +43,9 @@ const metadataSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true
+    },
+    params: {
+        type: Object,
     }
 }, { timestamps: true });
 

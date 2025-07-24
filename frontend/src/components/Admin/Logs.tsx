@@ -7,10 +7,12 @@ const Logs: React.FC = () => {
     const [logs, setLogs] = useState<any[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalLogs, setTotalLogs] = useState(0);
+    const [loading, setLoading] = useState(false);
     const logsPerPage = 7;
 
     useEffect(() => {
         const fetchLogs = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get('http://localhost:3000/logs/fetch', {
                     params: {
@@ -27,11 +29,14 @@ const Logs: React.FC = () => {
                 }
             } catch (error) {
                 console.error('Error fetching logs:', error);
+            } finally {
+                setLoading(false); // hide loader after fetch
             }
         };
 
         fetchLogs();
     }, [currentPage]);
+
 
     const totalPages = Math.ceil(totalLogs / logsPerPage);
 
@@ -59,6 +64,17 @@ const Logs: React.FC = () => {
     return (
         <AdminLayout pageTitle="Logs">
             <div className="space-y-6">
+                {loading && (
+                    <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+                        <div className="flex items-center space-x-2">
+                            <svg className="animate-spin h-6 w-6 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                            <span className="text-gray-800 text-sm font-medium">Loading logs...</span>
+                        </div>
+                    </div>
+                )}
                 <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">

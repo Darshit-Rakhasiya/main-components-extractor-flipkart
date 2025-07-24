@@ -14,7 +14,8 @@ exports.submitMetadata = async (req, res) => {
         logCollectionName,
         domainName,
         category,
-        type
+        type,
+        params
     } = req.body;
 
     console.log(req.body);
@@ -106,6 +107,13 @@ exports.submitMetadata = async (req, res) => {
             category,
             type
         });
+
+        if (params !== undefined) {
+            await db.collection('metadata').updateOne(
+                { apiName: metadata.apiName },
+                { $set: { params: metadata.params } } 
+            );
+        }
 
         await DevLog.create({
             message: `Metadata submitted: ${domainName} > ${category} > ${type} [${databaseName}.${keyCollectionName}]`
