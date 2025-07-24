@@ -13,48 +13,71 @@ exports.getAllLogs = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
+        const search = req.query.search?.trim()?.toLowerCase() || '';
+
+        const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+        const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+        if (endDate) endDate.setHours(23, 59, 59, 999); // Include full end day
 
         const metadataList = await Metadata.find();
         let allLogs = [];
 
         for (const metadata of metadataList) {
             const { mongoDbUrl, databaseName, logCollectionName } = metadata;
-
-            // Skip if required info is missing
             if (!mongoDbUrl || !databaseName || !logCollectionName) continue;
 
             try {
                 const conn = await mongoose.createConnection(mongoDbUrl, {
                     dbName: databaseName,
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true
                 }).asPromise();
 
                 const LogModel = createDynamicLogModel(conn, logCollectionName);
-                const logs = await LogModel.find().lean();
-
+                const logs = await LogModel.find().lean(); // raw fetch for now
                 allLogs.push(...logs);
-                await conn.close(); // Cleanup
+
+                await conn.close();
             } catch (err) {
-                console.error(`Error with DB: ${databaseName}, Collection: ${logCollectionName}`, err);
+                console.error(`DB error: ${databaseName} | Collection: ${logCollectionName}`, err);
             }
         }
 
+        // Sort logs
         allLogs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
-        const paginatedLogs = allLogs.slice(skip, skip + limit);
+        // Apply in-memory date filter
+        let filteredLogs = allLogs;
+        if (startDate && endDate) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.createdAt &&
+                new Date(log.createdAt) >= startDate &&
+                new Date(log.createdAt) <= endDate
+            );
+        } else if (startDate) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.createdAt && new Date(log.createdAt) >= startDate
+            );
+        }
+
+        // Apply search filter
+        if (search) {
+            filteredLogs = filteredLogs.filter(log =>
+                (log.ip?.toLowerCase().includes(search) || log?.params?.url?.toLowerCase().includes(search))
+            );
+        }
+
+        const paginatedLogs = filteredLogs.slice(skip, skip + limit);
 
         await devLog.create({
-            message: `All logs retrieved from multiple DBs (Page: ${page}, Limit: ${limit})`
+            message: `Logs retrieved | Page: ${page} | Limit: ${limit} | Search: ${search || 'None'} | Date: ${startDate || 'None'} to ${endDate || 'None'}`
         });
 
         res.status(200).json({
             success: true,
             logs: paginatedLogs,
             count: paginatedLogs.length,
-            totalLogs: allLogs.length,
+            totalLogs: filteredLogs.length,
             currentPage: page,
-            totalPages: Math.ceil(allLogs.length / limit),
+            totalPages: Math.ceil(filteredLogs.length / limit),
         });
 
     } catch (err) {
@@ -62,6 +85,8 @@ exports.getAllLogs = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+
 
 exports.insertLog = async (req, res) => {
     try {

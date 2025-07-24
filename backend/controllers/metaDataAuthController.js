@@ -154,3 +154,35 @@ exports.countMetadata = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+exports.fetchMetaData = async (req, res) => {
+    try {
+        const Meta = await Metadata.find();
+
+        await DevLog.create({ message: `All metadata retrieved` })
+
+        res.status(200).json({
+            success: true,
+            Meta
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+exports.updateStatus = async (req, res) => {
+    try {
+        const Meta = await Metadata.find();
+
+        await DevLog.create({ message: `All metadata retrieved` })
+
+        res.status(200).json({
+            success: true,
+            Meta
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}

@@ -1,248 +1,224 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Plus, Shield } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
-import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
-interface Admin {
-  id: string;
-  name: string;
-  email: string;
-  status: 'Active' | 'Blocked';
-  createdAt: string;
+interface ApiItem {
+  category?: string;
+  apiName?: string;
+  method?: string;
+  status?: boolean; // changed from Boolean to boolean for standard TypeScript type
 }
 
 const ApiListingPage: React.FC = () => {
-  const [admins, setAdmins] = useState<Admin[]>([]);
-  const [filteredAdmins, setFilteredAdmins] = useState<Admin[]>([]);
+  const [data, setData] = useState<ApiItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({
+  const [filters, setFilters] = useState({
+    category: '',
     name: '',
-    email: '',
-    password: ''
+    method: '',
+    status: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const mockAdmins: Admin[] = [
-      {
-        id: '1',
-        name: 'John Admin',
-        email: 'john@admin.com',
-        status: 'Active',
-        createdAt: '2024-01-15T10:30:00Z'
-      },
-      {
-        id: '2',
-        name: 'Jane Editor',
-        email: 'jane@admin.com',
-        status: 'Active',
-        createdAt: '2024-02-20T14:45:00Z'
-      },
-      {
-        id: '3',
-        name: 'Bob Manager',
-        email: 'bob@admin.com',
-        status: 'Blocked',
-        createdAt: '2024-03-10T09:15:00Z'
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get('http://localhost:3000/meta/fetch');
+        const fetched = res.data?.Meta || [];
+        setData(fetched);
+      } catch (err) {
+        console.error('Error fetching API metadata:', err);
+      } finally {
+        setLoading(false);
       }
-    ];
-    setAdmins(mockAdmins);
-    setFilteredAdmins(mockAdmins);
+    };
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const filtered = admins.filter(admin =>
-      admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredAdmins(filtered);
-  }, [searchTerm, admins]);
+  const filteredData = data.filter((item) => {
+    const matchCategory = (item.category || '').toLowerCase().includes(filters.category.toLowerCase());
+    const matchName = (item.apiName || '').toLowerCase().includes(filters.name.toLowerCase());
+    const matchMethod = filters.method === '' || item.method === filters.method;
+    const matchStatus =
+      filters.status === '' ||
+      (filters.status === 'Active' && item.status === true) ||
+      (filters.status === 'Inactive' && item.status === false);
 
-  // const handleAddAdmin = () => {
-  //   const admin: Admin = {
-  //     id: Date.now().toString(),
-  //     name: newAdmin.name,
-  //     email: newAdmin.email,
-  //     // role: newAdmin.role,
-  //     status: 'Active',
-  //     createdAt: new Date().toISOString()
-  //   };
-  //   setAdmins([...admins, admin]);
-  //   setNewAdmin({ name: '', email: '',  password: '' });
-  //   setShowAddModal(false);
-  // };
- 
-  const handleAddAdmin = async () => {
-  // optional validation
-  if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-    toast.error("All fields are required");
-    return;
-  }
-  console.log("📤 Sending Admin Data:", newAdmin);
-  try {
-    const response = await axios.post('http://localhost:3000/admin/register', {
-      name: newAdmin.name,
-      email: newAdmin.email,
-      password: newAdmin.password
-    });
+    const globalMatch =
+      (item.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.apiName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.method || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.status !== undefined && (item.status ? 'active' : 'inactive').includes(searchTerm.toLowerCase()));
 
-    if (response.data.success) {
-      // Add admin to UI list
-      const admin: Admin = {
-        id: Date.now().toString(),
-        name: newAdmin.name,
-        email: newAdmin.email,
-        status: 'Active',
-        createdAt: new Date().toISOString()
-      };
+    return matchCategory && matchName && matchMethod && matchStatus && globalMatch;
+  });
 
-      setAdmins([...admins, admin]);
-      setNewAdmin({ name: '', email: '', password: '' });
-      setShowAddModal(false);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-      toast.success('Admin created successfully!', {
-        position: 'top-center',
-        duration: 4000
-      });
-    } else {
-      toast.error(response.data.message || 'Failed to create admin');
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleViewDetails = (apiName?: string) => {
+    if (apiName) {
+      navigate(`/meta/${encodeURIComponent(apiName)}`);
     }
-
-  } catch (error: any) {
-    console.error('❌ Error:', error);
-    toast.error(error.response?.data?.message || 'Something went wrong', {
-      position: 'top-center'
-    });
-  }
-};
-
-  
+  };
 
   return (
-    <AdminLayout pageTitle="Admin Details">
-      <div className="space-y-6">
-        {/* Search & Add */}
-        <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center space-x-2 bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Add New Admin</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Admins Table */}
-        <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Admin Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created At</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredAdmins.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                          <Shield className="w-5 h-5 text-emerald-600" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{admin.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{admin.email}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${admin.status === 'Active'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-red-100 text-red-800'
-                        }`}>
-                        {admin.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {new Date(admin.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Add Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Admin</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    name='name'
-                    value={newAdmin.name}
-                    onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    name='email'
-                    value={newAdmin.email}
-                    onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                  <input
-                    type="password"
-                    name='password'
-                    value={newAdmin.password}
-                    onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-              </div>
-              <div className="flex space-x-3 mt-6">
-                <button
-                  onClick={handleAddAdmin}
-                  className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700"
-                >
-                  Add Admin
-                </button>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
+    <AdminLayout pageTitle="API Listing">
+      <div className="space-y-4">
+        {loading && (
+          <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="flex items-center space-x-2">
+              <svg className="animate-spin h-6 w-6 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <span className="text-gray-800 text-sm font-medium">Loading APIs...</span>
             </div>
           </div>
         )}
+
+        {/* Global Search */}
+        <input
+          type="text"
+          placeholder="Master Search Bar"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+
+        {/* Table */}
+        <div className="overflow-x-auto bg-white/80 backdrop-blur-md rounded-xl border border-gray-200">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-100 text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-4 py-2">
+                  <input
+                    type="text"
+                    placeholder="Category"
+                    value={filters.category}
+                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                    className="w-full px-2 py-1 border rounded-md"
+                  />
+                </th>
+                <th className="px-4 py-2">
+                  <input
+                    type="text"
+                    placeholder="API Name"
+                    value={filters.name}
+                    onChange={(e) => handleFilterChange('name', e.target.value)}
+                    className="w-full px-2 py-1 border rounded-md"
+                  />
+                </th>
+                <th className="px-4 py-2">
+                  <select
+                    value={filters.method}
+                    onChange={(e) => handleFilterChange('method', e.target.value)}
+                    className="w-full px-2 py-1 border rounded-md"
+                  >
+                    <option value="">All Methods</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                  </select>
+                </th>
+                <th className="px-4 py-2">
+                  <select
+                    value={filters.status}
+                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                    className="w-full px-2 py-1 border rounded-md"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </th>
+                <th className="px-4 py-2"></th>
+              </tr>
+              <tr>
+                <th className="px-4 py-2">Category</th>
+                <th className="px-4 py-2">API Name</th>
+                <th className="px-4 py-2">Method</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((item, idx) => (
+                <tr key={idx} className="hover:bg-gray-50">
+                  <td className="px-4 py-2">{item.category || 'N/A'}</td>
+                  <td className="px-4 py-2">{item.apiName || 'N/A'}</td>
+                  <td className="px-4 py-2">{item.method || 'N/A'}</td>
+                  <td className="px-4 py-2">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${item.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                    >
+                      {item.status ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2">
+                    <button
+                      onClick={() => handleViewDetails(item.apiName)}
+                      className="text-blue-600 hover:underline text-xs"
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {paginatedData.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-center py-4 text-gray-400">
+                    No results found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-600">
+            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}–
+            {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="text-sm font-medium px-2 py-1">
+              {currentPage} / {totalPages || 1}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );

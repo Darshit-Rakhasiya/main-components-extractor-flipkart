@@ -48,7 +48,6 @@ const AdminDashboard: React.FC = () => {
   return (
     <AdminLayout pageTitle="Dashboard">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Total Users Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -62,7 +61,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Total API Keys Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
@@ -77,7 +75,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Users vs API Keys Bar Chart */}
       <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 border border-gray-200">
         <div className="flex items-center space-x-2 mb-6">
           <BarChart3 className="w-5 h-5 text-indigo-600" />

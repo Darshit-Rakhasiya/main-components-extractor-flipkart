@@ -24,6 +24,7 @@ import ApiListingPage from './components/Admin/ApiListingPage';
 // import SettingsPage from './components/Admin/SettingsPage';
 import ProtectedRoute from './ProtectedRoute';
 import Logs from './components/Admin/Logs';
+import MetaDetailPage from './components/Admin/MetaDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -48,6 +49,7 @@ const App: React.FC = () => {
         <Route path="/admin/config-api" element={<ConfigApiPage />} />
         <Route path="/admin/api-listing" element={<ApiListingPage />} />
         <Route path='/admin/logs' element={<Logs />} />
+        <Route path='/meta/:apiName' element={<MetaDetailPage />} />
         {/* <Route path="/admin/user-details" element={<UserDetailsPage />} /> */}
         {/* <Route path="/admin/usage-key-details" element={<UsageKeyDetailsPage />} /> */}
         {/* <Route path="/admin/generate-key" element={<GenerateKeyPage />} /> */}
