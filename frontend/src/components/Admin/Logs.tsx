@@ -6,7 +6,7 @@ import axios from 'axios';
 const Logs: React.FC = () => {
     const [logs, setLogs] = useState<any[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalLogs, setTotalLogs] = useState(0);  
+    const [totalLogs, setTotalLogs] = useState(0);
     const logsPerPage = 7;
 
     useEffect(() => {
@@ -52,7 +52,7 @@ const Logs: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);  
+            setCurrentPage(page);
         }
     };
 
@@ -75,7 +75,7 @@ const Logs: React.FC = () => {
                             <tbody className="divide-y divide-gray-200">
                                 {currentLogs.map((log) => (
                                     <tr
-                                        key={log._id}
+                                        key={log._id || "N/A"}
                                         className="hover:bg-gray-50 cursor-pointer"
                                         onClick={() => openModal(log)}
                                     >
@@ -85,20 +85,20 @@ const Logs: React.FC = () => {
                                                     <Shield className="w-5 h-5 text-emerald-600" />
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className="text-sm font-medium text-gray-900">{log.ip}</div>
+                                                    <div className="text-sm font-medium text-gray-900">{log.ip || "N/A"}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-900">
-                                            <a href={log.params.url} target="_blank" className="text-blue-500 hover:underline">
-                                                {log.params.url}
+                                            <a href={log?.params?.url || "#"} target="_blank" className="text-blue-500 hover:underline">
+                                                {log?.params?.url || "N/A"}
                                             </a>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{log.status_code}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{log.response.message}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{log.response.execution_time}s</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">{log?.status_code ?? "N/A"}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">{log?.response?.message ?? "N/A"}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">{log?.response?.execution_time ?? "N/A"}s</td>
                                         <td className="px-6 py-4 text-sm text-gray-900">
-                                            {new Date(log.createdAt).toLocaleDateString()}
+                                            {log?.createdAt ? new Date(log.createdAt).toLocaleDateString() : "N/A"}
                                         </td>
                                     </tr>
                                 ))}
@@ -131,61 +131,70 @@ const Logs: React.FC = () => {
                 {showModal && selectedLog && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-xl p-6 w-full max-w-3xl overflow-y-auto max-h-[90vh]">
+                            <button
+                                onClick={closeModal}
+                                className="absolute top-4 right-4 bg-gray-200 text-gray-800 hover:bg-gray-300 rounded-full p-2 shadow-md z-10"
+                                aria-label="Close Modal"
+                            >
+                                ✕
+                            </button>
                             <h3 className="text-xl font-semibold text-gray-900 mb-4">Log Details</h3>
                             <div className="space-y-4">
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">IP</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.ip}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.ip || "N/A"}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">URL</strong>
                                     <div className="text-sm text-blue-500">
-                                        <a href={selectedLog.params.url} target="_blank" className="hover:underline">
-                                            {selectedLog.params.url}
+                                        <a href={selectedLog?.params?.url || "N/A"} target="_blank" className="hover:underline">
+                                            {selectedLog?.params?.url || "N/A"}
                                         </a>
                                     </div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">API Key</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.params.api}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.params?.api || "N/A"}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Status Code</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.status_code}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.status_code || "N/A"}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Key</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.key}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.key || "N/A"}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Message</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.response.message}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.response?.message || "N/A"}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Execution Time</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.response.execution_time}s</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.response?.execution_time || "N/A"}s</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Success</strong>
-                                    <div className="text-sm text-gray-900">{selectedLog.response.success ? 'Yes' : 'No'}</div>
+                                    <div className="text-sm text-gray-900">{selectedLog?.response?.success ? 'Yes' : 'No'}</div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Query Params</strong>
-                                    <pre className="text-sm text-gray-900">{JSON.stringify(selectedLog.response.query_params, null, 2)}</pre>
+                                    <pre className="text-sm text-gray-900">{JSON.stringify(selectedLog?.response?.query_params, null, 2)}</pre>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Product Data</strong>
                                     <div className="text-sm text-gray-900">
-                                        <div>Name: {selectedLog.response.data.name}</div>
-                                        <div>Price: {selectedLog.response.data.price}</div>
-                                        <div>Discount: {selectedLog.response.data.discount}%</div>
-                                        <div>MRP: {selectedLog.response.data.mrp}</div>
-                                        <div>Ratings: {selectedLog.response.data.ratings_count}</div>
+                                        <div>Name: {selectedLog?.response?.data?.name || "N/A"}</div>
+                                        <div>Price: {selectedLog?.response?.data?.price || "N/A"}</div>
+                                        <div>Discount: {selectedLog?.response?.data?.discount ?? "N/A"}%</div>
+                                        <div>MRP: {selectedLog?.response?.data?.mrp || "N/A"}</div>
+                                        <div>Ratings: {selectedLog?.response?.data?.ratings_count ?? "N/A"}</div>
                                     </div>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Category Hierarchy</strong>
-                                    <pre className="text-sm text-gray-900">{JSON.stringify(selectedLog.response.data.category_hierarchy, null, 2)}</pre>
+                                    <pre className="text-sm text-gray-900">
+                                        {JSON.stringify(selectedLog?.response?.data?.category_hierarchy || {}, null, 2)}
+                                    </pre>
                                 </div>
                                 <div>
                                     <strong className="block text-sm font-medium text-gray-700">Created At</strong>
@@ -193,16 +202,6 @@ const Logs: React.FC = () => {
                                         {new Date(selectedLog.createdAt).toLocaleDateString()}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Close Button */}
-                            <div className="mt-4 flex justify-end">
-                                <button
-                                    onClick={closeModal}
-                                    className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
-                                >
-                                    Close
-                                </button>
                             </div>
                         </div>
                     </div>

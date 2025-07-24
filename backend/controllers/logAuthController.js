@@ -1,5 +1,12 @@
 const Log = require('../models/Log');
 const devLog = require("../models/DevLog")
+const mongoose = require('mongoose');
+const Metadata = require('../models/MetaData');
+
+const createDynamicLogModel = (connection, collectionName) => {
+    const logSchema = new mongoose.Schema({}, { strict: false, timestamps: true });
+    return connection.model('Log', logSchema, collectionName);
+};
 
 exports.getAllLogs = async (req, res) => {
     try {
@@ -7,24 +14,49 @@ exports.getAllLogs = async (req, res) => {
         const limit = parseInt(req.query.limit) || 8;
         const skip = (page - 1) * limit;
 
-        const [logs, totalLogs] = await Promise.all([
-            Log.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-            Log.countDocuments()
-        ]);
-        
+        const metadataList = await Metadata.find();
+        let allLogs = [];
+
+        for (const metadata of metadataList) {
+            const { mongoDbUrl, databaseName, logCollectionName } = metadata;
+
+            // Skip if required info is missing
+            if (!mongoDbUrl || !databaseName || !logCollectionName) continue;
+
+            try {
+                const conn = await mongoose.createConnection(mongoDbUrl, {
+                    dbName: databaseName,
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true
+                }).asPromise();
+
+                const LogModel = createDynamicLogModel(conn, logCollectionName);
+                const logs = await LogModel.find().lean();
+
+                allLogs.push(...logs);
+                await conn.close(); // Cleanup
+            } catch (err) {
+                console.error(`Error with DB: ${databaseName}, Collection: ${logCollectionName}`, err);
+            }
+        }
+
+        allLogs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+        const paginatedLogs = allLogs.slice(skip, skip + limit);
+
         await devLog.create({
-            message: `All logs retrieved (Page: ${page}, Limit: ${limit})`
+            message: `All logs retrieved from multiple DBs (Page: ${page}, Limit: ${limit})`
         });
-        console.log(page, totalLogs);
 
         res.status(200).json({
             success: true,
-            logs,
-            count: logs.length,
-            totalLogs,
+            logs: paginatedLogs,
+            count: paginatedLogs.length,
+            totalLogs: allLogs.length,
             currentPage: page,
-            totalPages: Math.ceil(totalLogs / limit),
+            totalPages: Math.ceil(allLogs.length / limit),
         });
+
     } catch (err) {
         console.error('Error retrieving logs:', err);
         res.status(500).json({ success: false, message: 'Server error' });
