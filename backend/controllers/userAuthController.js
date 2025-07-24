@@ -86,6 +86,22 @@ exports.getAllUser = async (req, res) => {
     }
 };
 
+exports.countUser = async (req, res) => {
+    try {
+        const users = await User.countDocuments({});
+
+        await devLog.create({ message: `Count of user retrieved` })
+
+        res.status(200).json({
+            success: true,
+            count: users
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 exports.deleteUser = async (req, res) => {
     const { email } = req.body;
 

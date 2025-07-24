@@ -111,7 +111,7 @@ exports.submitMetadata = async (req, res) => {
         if (params !== undefined) {
             await db.collection('metadata').updateOne(
                 { apiName: metadata.apiName },
-                { $set: { params: metadata.params } } 
+                { $set: { params: metadata.params } }
             );
         }
 
@@ -136,5 +136,21 @@ exports.submitMetadata = async (req, res) => {
         if (client) {
             await client.close();
         }
+    }
+};
+
+exports.countMetadata = async (req, res) => {
+    try {
+        const countMeta = await Metadata.countDocuments({});
+
+        await DevLog.create({ message: `count of metadata retrieved` })
+
+        res.status(200).json({
+            success: true,
+            count: countMeta
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 };
